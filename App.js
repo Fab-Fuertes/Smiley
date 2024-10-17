@@ -1,12 +1,27 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { NavigationContainer } from '@react-navigation/native';
+import MenuCalificaciones from './screens/CalificaconesPrev';
+import Inicio from './screens/Home';
 
 export default function App() {
+
+  const Tab = createBottomTabNavigator();
+
+  function MyTabs() {
+    return (
+      <Tab.Navigator>
+        <Tab.Screen name="Inicio" component={Inicio} options={{title: "INICIO", headerTitleAlign: "center", headerStyle: {backgroundColor: "#8B1874"}, headerTintColor: "white",}} />
+        <Tab.Screen name="Calificaciones Baños" component={MenuCalificaciones} options={{title: "CALIFICACIONES", headerTitleAlign: "center", headerStyle: {backgroundColor: "#8B1874"}, headerTintColor: "white",}} />
+      </Tab.Navigator>
+    );
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app! Hola mundo</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <MyTabs />
+    </NavigationContainer>
   );
 }
 

@@ -1,11 +1,11 @@
 import { Text, StyleSheet, View } from 'react-native'
 import React, { useState, useEffect } from 'react'
 
-export default function Inicio() {
+export default function MenuCalificaciones() {
 
     return (
       <View>
-        <Text>Bienvenido</Text>
+        <Text>CalificaconesPrev</Text>
       </View>
     )
 }
