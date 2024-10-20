@@ -6,6 +6,7 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
+import UmbralConfig from "./UmbralConfig";
 
 // Componente para mostrar los datos obtenidos del backend
 const DataDisplay = () => {
@@ -19,22 +20,16 @@ const DataDisplay = () => {
 
       // Detecta si la plataforma es web o móvil
       if (Platform.OS === "web") {
-        // Si está en un entorno web, usa localhost para el backend
         backendURL = "http://localhost:8000";
       } else {
-        // Si está en un emulador Android, usa la IP específica del emulador
         backendURL = "http://10.0.2.2:8000";
       }
 
       try {
-        // Realiza la petición al servidor
         const response = await fetch(`${backendURL}/test`);
-
-        // Verifica si la respuesta es exitosa
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-
         const jsonData = await response.json();
         setData(jsonData);
       } catch (err) {
@@ -68,28 +63,43 @@ const DataDisplay = () => {
     <View style={styles.container}>
       <Text style={styles.title}>Terminales:</Text>
       {data.Terminales ? (
-        Object.entries(data.Terminales).map(([key, value]) => (
-          <Text key={key} style={styles.item}>{`${key}: ${value}`}</Text>
-        ))
+        Object.entries(data.Terminales).map(([terminalKey, terminalData]) => {
+          const terminalId = terminalData.ID;
+          const umbral = terminalData.umbral; // Obtén el umbral configurado
+          const opinionsForTerminal = data.opiniones[terminalId] || {};
+          const totalOpinions = Object.keys(opinionsForTerminal).length;
+
+          return (
+            <View key={terminalKey}>
+              <Text style={styles.item}>{`Terminal ID: ${terminalId}`}</Text>
+
+              <Text>{`Total de opiniones: ${totalOpinions}`}</Text>
+
+              {/* Detalles de las opiniones */}
+              <Text
+                style={styles.title}
+              >{`Opiniones de Terminal ${terminalId}`}</Text>
+              {totalOpinions > 0 ? (
+                Object.entries(opinionsForTerminal).map(
+                  ([timestamp, opinion]) => (
+                    <View key={timestamp} style={styles.opinion}>
+                      <Text>{`Fecha: ${opinion.fecha}`}</Text>
+                      <Text>{`Hora: ${opinion.hora}`}</Text>
+                      <Text>{`Apreciación: ${opinion.apreciacion}`}</Text>
+                    </View>
+                  )
+                )
+              ) : (
+                <Text>No hay opiniones para este terminal</Text>
+              )}
+              <Text style={styles.subtitle}>{`Umbral Configurado: ${umbral}`}</Text>
+              {/* Renderiza el componente UmbralConfig para cada terminal */}
+              <UmbralConfig terminalId={terminalData.ID} />
+            </View>
+          );
+        })
       ) : (
         <Text>No hay terminales disponibles</Text>
-      )}
-
-      <Text style={styles.title}>Opiniones:</Text>
-      {data.opiniones ? (
-        Object.entries(data.opiniones).map(([userId, opinions]) => (
-          <View key={userId}>
-            <Text style={styles.subtitle}>Opiniones de {userId}:</Text>
-            {Object.entries(opinions).map(([timestamp, opinion]) => (
-              <Text
-                key={timestamp}
-                style={styles.item}
-              >{`[${opinion.fecha} ${opinion.hora}] ${opinion.apreciacion}`}</Text>
-            ))}
-          </View>
-        ))
-      ) : (
-        <Text>No hay opiniones disponibles</Text>
       )}
     </View>
   );
