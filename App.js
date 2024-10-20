@@ -2,8 +2,11 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import MenuCalificaciones from './screens/CalificaconesPrev';
 import Inicio from './screens/Home';
+import Perfil from './screens/Perfil';
+import CalificacionesAnteriores from './screens/CalificacionesAnteriores';
 
 export default function App() {
 
@@ -12,8 +15,18 @@ export default function App() {
   function MyTabs() {
     return (
       <Tab.Navigator>
-        <Tab.Screen name="Inicio" component={Inicio} options={{title: "INICIO", headerTitleAlign: "center", headerStyle: {backgroundColor: "#8B1874"}, headerTintColor: "white",}} />
-        <Tab.Screen name="Calificaciones Baños" component={MenuCalificaciones} options={{title: "CALIFICACIONES", headerTitleAlign: "center", headerStyle: {backgroundColor: "#8B1874"}, headerTintColor: "white",}} />
+        <Tab.Screen name="Inicio" component={Inicio} options={{title: "INICIO", headerTitleAlign: "center", headerStyle: {backgroundColor: "#0000ff"}, tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="home" color={color} size={size} />
+          ), headerTintColor: "white",}} />
+        <Tab.Screen name="Calificaciones Baños" component={MenuCalificaciones} options={{title: "CALIFICACIONES", headerTitleAlign: "center", headerStyle: {backgroundColor: "#0000ff"}, tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="newspaper-variant" color={color} size={size} />
+          ), headerTintColor: "white",}} />
+          <Tab.Screen name="Calificaciones Anteriores" component={CalificacionesAnteriores} options={{title: "RESEÑAS", headerTitleAlign: "center", headerStyle: {backgroundColor: "#0000ff"}, tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="clipboard-text-multiple-outline" color={color} size={size} />
+          ), headerTintColor: "white",}} />
+        <Tab.Screen name="Perfil" component={Perfil} options={{title: "PERFIL", headerTitleAlign: "center", headerStyle: {backgroundColor: "#0000ff"}, tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="account" color={color} size={size} />
+          ), headerTintColor: "white",}} />
       </Tab.Navigator>
     );
   }
