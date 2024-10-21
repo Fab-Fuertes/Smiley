@@ -7,39 +7,67 @@ import {
   ActivityIndicator,
 } from "react-native";
 import UmbralConfig from "./UmbralConfig";
+import OpinionsDisplay from "./OpinionsDisplay";
 
-// Componente para mostrar los datos obtenidos del backend
 const DataDisplay = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [ws, setWs] = useState(null); // Agregar estado para WebSocket
+
+  // Configurar backendURL
+  let backendURL;
+
+  if (Platform.OS === "web") {
+    backendURL = "http://localhost:8000";
+  } else {
+    backendURL = "http://10.0.2.2:8000";
+  }
+
+  const refreshData = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${backendURL}/test`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const jsonData = await response.json();
+      setData(jsonData);
+    } catch (err) {
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      let backendURL;
+    refreshData();
 
-      // Detecta si la plataforma es web o móvil
-      if (Platform.OS === "web") {
-        backendURL = "http://localhost:8000";
-      } else {
-        backendURL = "http://10.0.2.2:8000";
-      }
+    // Configurar WebSocket
+    const socket = new WebSocket(`ws://10.0.2.2:8000`); // Cambia esto si es necesario
 
-      try {
-        const response = await fetch(`${backendURL}/test`);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const jsonData = await response.json();
-        setData(jsonData);
-      } catch (err) {
-        setError(err);
-      } finally {
-        setLoading(false);
-      }
+    socket.onopen = () => {
+      console.log("WebSocket connection established");
     };
 
-    fetchData();
+    socket.onmessage = (event) => {
+      const newData = JSON.parse(event.data);
+      setData((prevData) => ({ ...prevData, Terminales: newData }));
+    };
+
+    socket.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
+    socket.onclose = () => {
+      console.log("WebSocket connection closed");
+    };
+
+    setWs(socket); // Guardar socket en el estado
+
+    return () => {
+      socket.close(); // Cerrar la conexión al desmontar el componente
+    };
   }, []);
 
   if (loading) {
@@ -65,7 +93,7 @@ const DataDisplay = () => {
       {data.Terminales ? (
         Object.entries(data.Terminales).map(([terminalKey, terminalData]) => {
           const terminalId = terminalData.ID;
-          const umbral = terminalData.umbral; // Obtén el umbral configurado
+          const umbral = terminalData.umbral;
           const opinionsForTerminal = data.opiniones[terminalId] || {};
           const totalOpinions = Object.keys(opinionsForTerminal).length;
 
@@ -73,28 +101,11 @@ const DataDisplay = () => {
             <View key={terminalKey}>
               <Text style={styles.item}>{`Terminal ID: ${terminalId}`}</Text>
 
-              <Text>{`Total de opiniones: ${totalOpinions}`}</Text>
+              <OpinionsDisplay terminalId={terminalData.ID} opinions={data.opiniones[terminalId] || {}} />
 
-              {/* Detalles de las opiniones */}
-              <Text
-                style={styles.title}
-              >{`Opiniones de Terminal ${terminalId}`}</Text>
-              {totalOpinions > 0 ? (
-                Object.entries(opinionsForTerminal).map(
-                  ([timestamp, opinion]) => (
-                    <View key={timestamp} style={styles.opinion}>
-                      <Text>{`Fecha: ${opinion.fecha}`}</Text>
-                      <Text>{`Hora: ${opinion.hora}`}</Text>
-                      <Text>{`Apreciación: ${opinion.apreciacion}`}</Text>
-                    </View>
-                  )
-                )
-              ) : (
-                <Text>No hay opiniones para este terminal</Text>
-              )}
               <Text style={styles.subtitle}>{`Umbral Configurado: ${umbral}`}</Text>
-              {/* Renderiza el componente UmbralConfig para cada terminal */}
-              <UmbralConfig terminalId={terminalData.ID} />
+
+              <UmbralConfig terminalId={terminalData.ID} refreshData={refreshData} />
             </View>
           );
         })
