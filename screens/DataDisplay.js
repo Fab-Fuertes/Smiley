@@ -5,78 +5,70 @@ import {
   Text,
   StyleSheet,
   ActivityIndicator,
+  ScrollView,
 } from "react-native";
+import UmbralConfig from "./UmbralConfig";
+import OpinionsDisplay from "./OpinionsDisplay";
 
-export default function DataDisplay(){
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Terminales:</Text>
-      {data.Terminales ? (
-        Object.entries(data.Terminales).map(([key, value]) => (
-          <Text key={key} style={styles.item}>{`${key}: ${value}`}</Text>
-        ))
-      ) : (
-        <Text>No hay terminales disponibles</Text>
-      )}
-
-      <Text style={styles.title}>Opiniones:</Text>
-      {data.opiniones ? (
-        Object.entries(data.opiniones).map(([userId, opinions]) => (
-          <View key={userId}>
-            <Text style={styles.subtitle}>Opiniones de {userId}:</Text>
-            {Object.entries(opinions).map(([timestamp, opinion]) => (
-              <Text
-                key={timestamp}
-                style={styles.item}
-              >{`[${opinion.fecha} ${opinion.hora}] ${opinion.apreciacion}`}</Text>
-            ))}
-          </View>
-        ))
-      ) : (
-        <Text>No hay opiniones disponibles</Text>
-      )}
-    </View>
-  )
-}
-
-// Componente para mostrar los datos obtenidos del backend
-const DataDisplay = () => {
+export default function DataDisplay() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [ws, setWs] = useState(null); // Agregar estado para WebSocket
+
+  // Configurar backendURL
+  let backendURL;
+
+  if (Platform.OS === "web") {
+    backendURL = "http://localhost:8000";
+  } else {
+    backendURL = "http://10.0.2.2:8000";
+  }
+
+  const refreshData = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${backendURL}/test`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const jsonData = await response.json();
+      setData(jsonData);
+    } catch (err) {
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      let backendURL;
+    refreshData();
 
-      // Detecta si la plataforma es web o móvil
-      if (Platform.OS === "web") {
-        // Si está en un entorno web, usa localhost para el backend
-        backendURL = "http://localhost:8000";
-      } else {
-        // Si está en un emulador Android, usa la IP específica del emulador
-        backendURL = "http://10.0.2.2:8000";
-      }
+    // Configurar WebSocket
+    const socket = new WebSocket(`ws://10.0.2.2:8000`); // Cambia esto si es necesario
 
-      try {
-        // Realiza la petición al servidor
-        const response = await fetch(`${backendURL}/test`);
-
-        // Verifica si la respuesta es exitosa
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const jsonData = await response.json();
-        setData(jsonData);
-      } catch (err) {
-        setError(err);
-      } finally {
-        setLoading(false);
-      }
+    socket.onopen = () => {
+      console.log("WebSocket connection established");
     };
 
-    fetchData();
+    socket.onmessage = (event) => {
+      const newData = JSON.parse(event.data);
+      setData((prevData) => ({ ...prevData, Terminales: newData }));
+    };
+
+    socket.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
+    socket.onclose = () => {
+      console.log("WebSocket connection closed");
+    };
+
+    setWs(socket); // Guardar socket en el estado
+
+    return () => {
+      socket.close(); // Cerrar la conexión al desmontar el componente
+    };
   }, []);
 
   if (loading) {
@@ -96,8 +88,44 @@ const DataDisplay = () => {
     return <Text>No hay datos disponibles</Text>;
   }
 
- 
-};
+  return (
+    <ScrollView>
+      <View style={styles.container}>
+        <Text style={styles.title}>Terminales:</Text>
+        {data.Terminales ? (
+          Object.entries(data.Terminales).map(([terminalKey, terminalData]) => {
+            const terminalId = terminalData.ID;
+            const umbral = terminalData.umbral;
+            const opinionsForTerminal = data.opiniones[terminalId] || {};
+            const totalOpinions = Object.keys(opinionsForTerminal).length;
+
+            return (
+              <View key={terminalKey}>
+                <Text style={styles.item}>{`Terminal ID: ${terminalId}`}</Text>
+
+                <OpinionsDisplay
+                  terminalId={terminalData.ID}
+                  opinions={data.opiniones[terminalId] || {}}
+                />
+
+                <Text
+                  style={styles.subtitle}
+                >{`Umbral Configurado: ${umbral}`}</Text>
+
+                <UmbralConfig
+                  terminalId={terminalData.ID}
+                  refreshData={refreshData}
+                />
+              </View>
+            );
+          })
+        ) : (
+          <Text>No hay terminales disponibles</Text>
+        )}
+      </View>
+    </ScrollView>
+  );
+}
 
 // Estilos del componente
 const styles = StyleSheet.create({
@@ -120,3 +148,5 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
   },
 });
+
+//export default DataDisplay;
