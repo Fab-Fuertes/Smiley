@@ -1,6 +1,7 @@
 var admin = require("firebase-admin");
 require("dotenv").config();
 
+
 // Fetch the service account key JSON file contents
 var serviceAccount = {
   type: process.env.REACT_APP_TYPE,
@@ -26,3 +27,4 @@ admin.initializeApp({
 // Exporta la referencia de la base de datos
 var db = admin.database();
 module.exports = db;
+
