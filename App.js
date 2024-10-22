@@ -8,7 +8,6 @@ import Inicio from './screens/Home';
 import Perfil from './screens/Perfil';
 import DataDisplay from './screens/DataDisplay';
 import CalificacionesAnteriores from './screens/CalificacionesAnteriores';
-
 export default function App() {
 
   const Tab = createBottomTabNavigator();
