@@ -6,6 +6,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import MenuCalificaciones from './screens/CalificaconesPrev';
 import Inicio from './screens/Home';
 import Perfil from './screens/Perfil';
+import DataDisplay from './screens/DataDisplay';
 import CalificacionesAnteriores from './screens/CalificacionesAnteriores';
 
 export default function App() {
@@ -18,10 +19,10 @@ export default function App() {
         <Tab.Screen name="Inicio" component={Inicio} options={{title: "INICIO", headerTitleAlign: "center", headerStyle: {backgroundColor: "#0000ff"}, tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="home" color={color} size={size} />
           ), headerTintColor: "white",}} />
-        <Tab.Screen name="Calificaciones Baños" component={MenuCalificaciones} options={{title: "CALIFICACIONES", headerTitleAlign: "center", headerStyle: {backgroundColor: "#0000ff"}, tabBarIcon: ({ color, size }) => (
+        <Tab.Screen name="Calificaciones Baños" component={MenuCalificaciones} options={{title: "RANKING", headerTitleAlign: "center", headerStyle: {backgroundColor: "#0000ff"}, tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="newspaper-variant" color={color} size={size} />
           ), headerTintColor: "white",}} />
-          <Tab.Screen name="Calificaciones Anteriores" component={CalificacionesAnteriores} options={{title: "RESEÑAS", headerTitleAlign: "center", headerStyle: {backgroundColor: "#0000ff"}, tabBarIcon: ({ color, size }) => (
+          <Tab.Screen name="Data Display" component={DataDisplay} options={{title: "REACCIONES", headerTitleAlign: "center", headerStyle: {backgroundColor: "#0000ff"}, tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="clipboard-text-multiple-outline" color={color} size={size} />
           ), headerTintColor: "white",}} />
         <Tab.Screen name="Perfil" component={Perfil} options={{title: "PERFIL", headerTitleAlign: "center", headerStyle: {backgroundColor: "#0000ff"}, tabBarIcon: ({ color, size }) => (

@@ -1,10 +1,12 @@
 import { Text, Image, StyleSheet, View } from 'react-native'
 import React, { useState, useEffect } from 'react'
+import DataDisplay from './DataDisplay'
 
 export default function Inicio() {
     
 
     return (
+
       <View style={styles.container}>
       <Text style={styles.title}>SMILEY</Text>
       <Text style={styles.texto2}>Transformando la experiencia de cada visita</Text>
@@ -18,6 +20,9 @@ export default function Inicio() {
       <Text style={styles.slogan2}>
       Juntos, mejoramos los estándares de limpieza y comodidad en cada rincón de tu universidad.      </Text>
     </View>
+
+     
+
     )
 
     
