@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import {
   Platform,
@@ -6,12 +5,12 @@ import {
   Text,
   StyleSheet,
   ActivityIndicator,
+  ScrollView,
 } from "react-native";
 import UmbralConfig from "./UmbralConfig";
 import OpinionsDisplay from "./OpinionsDisplay";
 
-export default function Mostrar(){
-
+export default function DataDisplay() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -90,34 +89,42 @@ export default function Mostrar(){
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Terminales:</Text>
-      {data.Terminales ? (
-        Object.entries(data.Terminales).map(([terminalKey, terminalData]) => {
-          const terminalId = terminalData.ID;
-          const umbral = terminalData.umbral;
-          const opinionsForTerminal = data.opiniones[terminalId] || {};
-          const totalOpinions = Object.keys(opinionsForTerminal).length;
+    <ScrollView>
+      <View style={styles.container}>
+        <Text style={styles.title}>Terminales:</Text>
+        {data.Terminales ? (
+          Object.entries(data.Terminales).map(([terminalKey, terminalData]) => {
+            const terminalId = terminalData.ID;
+            const umbral = terminalData.umbral;
+            const opinionsForTerminal = data.opiniones[terminalId] || {};
+            const totalOpinions = Object.keys(opinionsForTerminal).length;
 
-          return (
-            <View key={terminalKey}>
-              <Text style={styles.item}>{`Terminal ID: ${terminalId}`}</Text>
+            return (
+              <View key={terminalKey}>
+                <Text style={styles.item}>{`Terminal ID: ${terminalId}`}</Text>
 
-              <OpinionsDisplay terminalId={terminalData.ID} opinions={data.opiniones[terminalId] || {}} />
+                <OpinionsDisplay
+                  terminalId={terminalData.ID}
+                  opinions={data.opiniones[terminalId] || {}}
+                />
 
-              <Text style={styles.subtitle}>{`Umbral Configurado: ${umbral}`}</Text>
+                <Text
+                  style={styles.subtitle}
+                >{`Umbral Configurado: ${umbral}`}</Text>
 
-              <UmbralConfig terminalId={terminalData.ID} refreshData={refreshData} />
-            </View>
-          );
-        })
-      ) : (
-        <Text>No hay terminales disponibles</Text>
-      )}
-    </View>
+                <UmbralConfig
+                  terminalId={terminalData.ID}
+                  refreshData={refreshData}
+                />
+              </View>
+            );
+          })
+        ) : (
+          <Text>No hay terminales disponibles</Text>
+        )}
+      </View>
+    </ScrollView>
   );
-
-
 }
 
 // Estilos del componente
