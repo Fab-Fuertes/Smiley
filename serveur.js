@@ -69,6 +69,39 @@ app.get("/count-opinions", async (req, res) => {
   }
 });
 
+// Ruta para contar solo las apreciaciones positivas del rating ("Bien")
+app.get("/count-positive-opinions", async (req, res) => {
+  try {
+    const ref = db.ref("/opiniones");
+    const snapshot = await ref.once("value");
+    const opinionsData = snapshot.val();
+
+    const positiveCounts = [];
+
+    for (const terminalId in opinionsData) {
+      const opinions = opinionsData[terminalId];
+      let positiveCount = 0;
+
+      for (const timestamp in opinions) {
+        const opinion = opinions[timestamp];
+        if (opinion.apreciacion === "Muy Bien" || opinion.apreciacion === "Bien") {
+          positiveCount++;
+        }
+      }
+
+      positiveCounts.push({ terminalId, positiveCount });
+    }
+
+    // Ordenar los baños por la cantidad de apreciaciones "Bien"
+    positiveCounts.sort((a, b) => b.positiveCount - a.positiveCount);
+
+    res.json(positiveCounts);
+  } catch (error) {
+    console.error("Error counting positive opinions:", error);
+    res.status(500).json({ error: "Error counting positive opinions" });
+  }
+});
+
 // Monitoreo de las reacciones y envío de alertas si se superan los umbrales
 const monitorReactions = () => {
   const terminalRef = db.ref("Terminales");

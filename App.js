@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import MenuCalificaciones from './screens/CalificaconesPrev';
+import MenuRating from './screens/MenuRating';
 import Inicio from './screens/Home';
 import Perfil from './screens/Perfil';
 import DataDisplay from './screens/DataDisplay';
@@ -19,7 +19,7 @@ export default function App() {
         <Tab.Screen name="Inicio" component={Inicio} options={{title: "INICIO", headerTitleAlign: "center", headerStyle: {backgroundColor: "#0000ff"}, tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="home" color={color} size={size} />
           ), headerTintColor: "white",}} />
-        <Tab.Screen name="Calificaciones Baños" component={MenuCalificaciones} options={{title: "RANKING", headerTitleAlign: "center", headerStyle: {backgroundColor: "#0000ff"}, tabBarIcon: ({ color, size }) => (
+        <Tab.Screen name="Calificaciones Baños" component={MenuRating} options={{title: "RANKING", headerTitleAlign: "center", headerStyle: {backgroundColor: "#0000ff"}, tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="newspaper-variant" color={color} size={size} />
           ), headerTintColor: "white",}} />
           <Tab.Screen name="Data Display" component={DataDisplay} options={{title: "REACCIONES", headerTitleAlign: "center", headerStyle: {backgroundColor: "#0000ff"}, tabBarIcon: ({ color, size }) => (
