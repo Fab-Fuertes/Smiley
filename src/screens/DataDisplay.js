@@ -28,7 +28,7 @@ export default function DataDisplay() {
   const refreshData = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${backendURL}/test`);
+      const response = await fetch(`${backendURL}/db`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }

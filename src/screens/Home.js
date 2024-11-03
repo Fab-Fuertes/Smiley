@@ -1,22 +1,23 @@
-import { Text, Image, StyleSheet, View, ScrollView } from "react-native";
+import { Text, Image, StyleSheet, View, ScrollView, Button } from "react-native";
 import React, { useState, useEffect } from "react";
+import auth from "@react-native-firebase/auth";
 
-export default function Inicio() {
+export default function Home({ user }) {
+  const handleSignOut = () => {
+    auth().signOut();
+  };
+
   return (
     <ScrollView>
       <View style={styles.container}>
         <Text style={styles.title}>SMILEY</Text>
+        <Text style={styles.welcomeText}>Bienvenido {user.email}</Text>
         <Text style={styles.texto2}>
           Transformando la experiencia de cada visita
         </Text>
         <Image
-          style={{
-            width: 300,
-            height: 300,
-            marginBottom: 30,
-            borderRadius: 50,
-          }}
-          source={require("../assets/imagen23.png")}
+          style={styles.image}
+          source={require("../../assets/imagen23.png")}
         />
         <Text style={styles.slogan}>
           Nuestro proyecto recopila, analiza y comparte las calificaciones
@@ -26,8 +27,9 @@ export default function Inicio() {
         </Text>
         <Text style={styles.slogan2}>
           Juntos, mejoramos los estándares de limpieza y comodidad en cada
-          rincón de tu universidad.{" "}
+          rincón de tu universidad.
         </Text>
+        <Button title="Cerrar sesión" onPress={handleSignOut} color="#FF0000" />
       </View>
     </ScrollView>
   );
@@ -67,5 +69,11 @@ const styles = StyleSheet.create({
     color: "white",
     textAlign: "justify",
     marginBottom: 15,
+  },
+  image: {
+    width: 300,
+    height: 300,
+    marginBottom: 30,
+    borderRadius: 50,
   },
 });

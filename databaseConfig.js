@@ -6,7 +6,7 @@ var serviceAccount = {
   type: process.env.REACT_APP_TYPE,
   project_id: process.env.REACT_APP_PROJECT_ID,
   private_key_id: process.env.REACT_APP_PRIVATE_KEY_ID,
-  private_key: process.env.REACT_APP_PRIVATE_KEY.replace(/\\n/g, "\n"), // Asegúrate de reemplazar los saltos de línea en el `private_key`
+  private_key: process.env.REACT_APP_PRIVATE_KEY.replace(/\\n/g, "\n"), // Asegurate de reemplazar los saltos de línea en el `private_key`
   client_email: process.env.REACT_APP_CLIENT_EMAIL,
   client_id: process.env.REACT_APP_CLIENT_ID,
   auth_uri: process.env.REACT_APP_AUTH_URI,
@@ -17,12 +17,17 @@ var serviceAccount = {
 };
 
 // Initialize the app with a service account, granting admin privileges
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  // The database URL depends on the location of the database
-  databaseURL: process.env.REACT_APP_DATABASE_URL,
-});
+try {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    // The database URL depends on the location of the database
+    databaseURL: process.env.REACT_APP_DATABASE_URL,
+  });
+} catch (error) {
+  console.error("Error al inicializar Firebase Admin SDK:", error);
+}
 
 // Exporta la referencia de la base de datos
 var db = admin.database();
-module.exports = db;
+var auth = admin.auth();
+module.exports = admin;
