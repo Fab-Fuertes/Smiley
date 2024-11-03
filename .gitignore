@@ -30,7 +30,13 @@ yarn-error.*
 
 # local env files
 .env*.local
-.env
 
 # typescript
 *.tsbuildinfo
+
+# ignores all .env files
+.env*
+
+# Advice: Add '/android' and '/ios' to your .gitignore file if you intend to use CNG / Prebuild. Learn more: https://docs.expo.dev/workflow/prebuild/#usage-with-eas-build
+/android
+/ios

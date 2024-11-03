@@ -1,11 +1,11 @@
 import { Text, StyleSheet, View } from 'react-native'
 import React, { useState, useEffect } from 'react'
 
-export default function CalificacionesAnteriores() {
+export default function Profile() {
 
   return (
     <View style={styles.container}>
-    <Text style={styles.title}>Reseñas</Text>
+    <Text style={styles.title}>Mi Perfil</Text>
     
     <View style={styles.inputContainer}>
     </View>
