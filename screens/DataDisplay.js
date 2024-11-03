@@ -5,6 +5,7 @@ import {
   Text,
   StyleSheet,
   ActivityIndicator,
+  serverTimestamp,
   ScrollView,
 } from "react-native";
 import UmbralConfig from "./UmbralConfig";
