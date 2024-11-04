@@ -13,14 +13,14 @@ enableScreens();
 import Home from "./src/screens/Home";
 import MenuRating from "./src/screens/MenuRating";
 import DataDisplay from "./src/screens/DataDisplay";
-import Profile from './src/screens/Profile';
+import Profile from "./src/screens/Profile";
+import CommonArea from "./src/screens/CommonArea";
 
 function App() {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState(null);
   const Tab = createBottomTabNavigator();
 
-  // Maneja los cambios en el estado de autenticación
   function onAuthStateChanged(user) {
     setUser(user);
     if (initializing) setInitializing(false);
@@ -28,7 +28,7 @@ function App() {
 
   useEffect(() => {
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber; // Cancela la suscripción cuando el componente se desmonta
+    return subscriber;
   }, []);
 
   if (initializing) return null;
@@ -37,75 +37,155 @@ function App() {
     return <LoginScreen />;
   }
 
-  // Configuración de pestañas
+  // Detectar el tipo de usuario
+  const isAnonymous = user.isAnonymous;
+  const isWorker = user.email && user.email.endsWith("@unimet.edu.ve");
+
+  const handleLogout = () => {
+    auth()
+      .signOut()
+      .then(() => {
+        Alert.alert("Has cerrado sesión");
+        setUser(null); // Asegúrate de limpiar el estado del usuario
+      })
+      .catch((error) => {
+        console.error("Error al cerrar sesión:", error);
+      });
+  };
+
   function MyTabs() {
     return (
       <Tab.Navigator>
-        <Tab.Screen
-          name="Home"
-          options={{
-            title: "INICIO",
-            headerTitleAlign: "center",
-            headerStyle: { backgroundColor: "#0000ff" },
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name="home" color={color} size={size} />
-            ),
-            headerTintColor: "white",
-          }}
-        >
-          {() => <Home user={user} />}
-        </Tab.Screen>
-        <Tab.Screen
-          name="Restrooms Rating"
-          component={MenuRating}
-          options={{
-            title: "RANKING",
-            headerTitleAlign: "center",
-            headerStyle: { backgroundColor: "#0000ff" },
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons
-                name="newspaper-variant"
-                color={color}
-                size={size}
-              />
-            ),
-            headerTintColor: "white",
-          }}
-        />
-        <Tab.Screen
-          name="Data Display"
-          component={DataDisplay}
-          options={{
-            title: "REACCIONES",
-            headerTitleAlign: "center",
-            headerStyle: { backgroundColor: "#0000ff" },
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons
-                name="clipboard-text-multiple-outline"
-                color={color}
-                size={size}
-              />
-            ),
-            headerTintColor: "white",
-          }}
-        />
-        <Tab.Screen
-          name="Profile"
-          component={Profile}
-          options={{
-            title: "PERFIL",
-            headerTitleAlign: "center",
-            headerStyle: { backgroundColor: "#0000ff" },
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons
-                name="account"
-                color={color}
-                size={size}
-              />
-            ),
-            headerTintColor: "white",
-          }}
-        />
+        {isAnonymous ? (
+          // Si el usuario es anónimo, mostrar WelcomeScreen y otras pestañas limitadas
+          <>
+            <Tab.Screen
+              name="Welcome"
+              options={{
+                title: "INICIO",
+                headerTitleAlign: "center",
+                headerStyle: { backgroundColor: "#007BFF" },
+                tabBarIcon: ({ color, size }) => (
+                  <MaterialCommunityIcons
+                    name="account-circle"
+                    color={color}
+                    size={size}
+                  />
+                ),
+                headerTintColor: "white",
+              }}
+            >
+              {() => <CommonArea user={user} onLogout={handleLogout} />}
+            </Tab.Screen>
+            <Tab.Screen
+              name="Data Display"
+              component={DataDisplay}
+              options={{
+                title: "REACCIONES",
+                headerTitleAlign: "center",
+                headerStyle: { backgroundColor: "#0000ff" },
+                tabBarIcon: ({ color, size }) => (
+                  <MaterialCommunityIcons
+                    name="clipboard-text-multiple-outline"
+                    color={color}
+                    size={size}
+                  />
+                ),
+                headerTintColor: "white",
+              }}
+            />
+            <Tab.Screen
+              name="Restrooms Rating"
+              component={MenuRating}
+              options={{
+                title: "RANKING",
+                headerTitleAlign: "center",
+                headerStyle: { backgroundColor: "#0000ff" },
+                tabBarIcon: ({ color, size }) => (
+                  <MaterialCommunityIcons
+                    name="newspaper-variant"
+                    color={color}
+                    size={size}
+                  />
+                ),
+                headerTintColor: "white",
+              }}
+            />
+          </>
+        ) : (
+          // Si el usuario NO es anónimo, mostrar todas las pestañas
+          <>
+            <Tab.Screen
+              name="Home"
+              options={{
+                title: "INICIO",
+                headerTitleAlign: "center",
+                headerStyle: { backgroundColor: "#0000ff" },
+                tabBarIcon: ({ color, size }) => (
+                  <MaterialCommunityIcons
+                    name="home"
+                    color={color}
+                    size={size}
+                  />
+                ),
+                headerTintColor: "white",
+              }}
+            >
+              {() => <Home user={user} />}
+            </Tab.Screen>
+            <Tab.Screen
+              name="Restrooms Rating"
+              component={MenuRating}
+              options={{
+                title: "RANKING",
+                headerTitleAlign: "center",
+                headerStyle: { backgroundColor: "#0000ff" },
+                tabBarIcon: ({ color, size }) => (
+                  <MaterialCommunityIcons
+                    name="newspaper-variant"
+                    color={color}
+                    size={size}
+                  />
+                ),
+                headerTintColor: "white",
+              }}
+            />
+            <Tab.Screen
+              name="Data Display"
+              component={DataDisplay}
+              options={{
+                title: "REACCIONES",
+                headerTitleAlign: "center",
+                headerStyle: { backgroundColor: "#0000ff" },
+                tabBarIcon: ({ color, size }) => (
+                  <MaterialCommunityIcons
+                    name="clipboard-text-multiple-outline"
+                    color={color}
+                    size={size}
+                  />
+                ),
+                headerTintColor: "white",
+              }}
+            />
+            <Tab.Screen
+              name="Profile"
+              component={Profile}
+              options={{
+                title: "PERFIL",
+                headerTitleAlign: "center",
+                headerStyle: { backgroundColor: "#0000ff" },
+                tabBarIcon: ({ color, size }) => (
+                  <MaterialCommunityIcons
+                    name="account"
+                    color={color}
+                    size={size}
+                  />
+                ),
+                headerTintColor: "white",
+              }}
+            />
+          </>
+        )}
       </Tab.Navigator>
     );
   }
@@ -153,6 +233,15 @@ function LoginScreen() {
       });
   };
 
+  const handleAnonymousSignIn = () => {
+    auth()
+      .signInAnonymously()
+      .then(() => Alert.alert("Acceso como usuario anónimo"))
+      .catch((error) => {
+        console.error("Error en el inicio de sesión anónimo:", error);
+      });
+  };
+
   return (
     <View style={styles.container}>
       <TextInput
@@ -160,15 +249,24 @@ function LoginScreen() {
         value={email}
         onChangeText={setEmail}
         autoCapitalize="none"
+        style={styles.input}
       />
       <TextInput
         placeholder="Contraseña"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
+        style={styles.input}
       />
       <Button title="Iniciar sesión" onPress={handleSignIn} />
       <Button title="Registrar" onPress={handleSignUp} />
+      <View style={styles.anonymousButton}>
+        <Button
+          title="Acceso sin registro"
+          onPress={handleAnonymousSignIn}
+          color="#808080"
+        />
+      </View>
     </View>
   );
 }
@@ -180,5 +278,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     padding: 16,
+  },
+  input: {
+    borderBottomWidth: 1,
+    borderColor: "#ccc",
+    marginBottom: 16,
+    padding: 8,
+  },
+  anonymousButton: {
+    marginTop: 20,
   },
 });

@@ -1,15 +1,16 @@
-import User from "./User";
+import UserBase from "./UserBase";
 // import serveur from "./serveur";
 import { View, Text, Button, StyleSheet, FlatList } from "react-native";
 import React, { useState } from "react";
 
-export default class Worker extends User {
+class Worker extends UserBase {
   constructor(name, email, password) {
-    super(name, email, password, 1); // Establece tipoUsuario en 1 para Trabajador
-    this._completedTasks = []; // Lista para almacenar labores completadas
-    this._negativeOpinions = []; // Lista de las opiniones negativas
-    this._isWorking = false; // Indica si está trabajando o no
+    super(name, email, password, 1); // Tipo de usuario 1 para Trabajador
+    this._completedTasks = [];
+    this._negativeOpinions = [];
+    this._isWorking = false;
   }
+
   //Método para manejar el cambio de texto
   manejarCambioTexto(nuevoTexto) {
     setTexto(nuevoTexto);
