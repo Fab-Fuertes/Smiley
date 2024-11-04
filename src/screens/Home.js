@@ -2,7 +2,7 @@ import { Text, Image, StyleSheet, View, ScrollView, Button } from "react-native"
 import React, { useState, useEffect } from "react";
 import auth from "@react-native-firebase/auth";
 
-export default function Home({ user }) {
+export default function Home({ user, accessType }) {
   const handleSignOut = () => {
     auth().signOut();
   };
