@@ -30,11 +30,16 @@ export default function MenuRating() {
   }, []);
 
   const renderItem = ({ item, index }) => (
-    <View style={styles.inputContainer}>
-      <Text>
-        {index + 1}. Terminal {item.terminalId} - Apreciaciones "Bien" o "Muy
-        Bien": {item.positiveCount}
+    <View>
+      <Text style={styles.index}>{index + 1}. </Text>
+      <View style={styles.inputContainer}> 
+      <Text style={styles.letraBonita1}>
+        Terminal 'Corimon', Piso({item.terminalId}):
       </Text>
+      <Text style={styles.letraBonita2}>
+        Apreciaciones Positivas: {item.positiveCount}
+      </Text>
+      </View>
     </View>
   );
 
@@ -54,12 +59,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#fff",
+    backgroundColor: "#007BFF",
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
+    fontFamily: 'serif',
+    color: 'white',
   },
   inputContainer: {
     borderWidth: 1,
@@ -67,5 +74,21 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     marginBottom: 20,
+    backgroundColor: 'white',
+  },
+  index: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    fontFamily: 'serif',
+  },
+  letraBonita1: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    fontFamily: 'serif',
+  },
+  letraBonita2: {
+    fontSize: 18,
+    fontStyle: 'italic',
+    fontFamily: 'serif',
   },
 });
