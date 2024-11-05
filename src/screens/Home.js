@@ -48,13 +48,14 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "white",
     marginBottom: 15,
+    fontFamily: 'serif',
   },
   texto2: {
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: "bold",
     color: "white",
     marginBottom: 25,
-    fontStyle: "italic",
+    fontFamily: 'serif',
   },
   slogan2: {
     fontSize: 18,
@@ -62,6 +63,7 @@ const styles = StyleSheet.create({
     color: "white",
     textAlign: "center",
     marginBottom: 25,
+    fontFamily: 'serif',
   },
   slogan: {
     fontSize: 18,
@@ -69,11 +71,18 @@ const styles = StyleSheet.create({
     color: "white",
     textAlign: "justify",
     marginBottom: 15,
+    fontFamily: 'serif',
   },
   image: {
     width: 300,
     height: 300,
     marginBottom: 30,
     borderRadius: 50,
+  },
+  welcomeText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    fontFamily: 'serif',
+    fontStyle: "italic",
   },
 });
