@@ -109,8 +109,8 @@ app.get("/count-positive-opinions", async (req, res) => {
       for (const timestamp in opinions) {
         const opinion = opinions[timestamp];
         if (
-          opinion.apreciacion === "Muy Bien" ||
-          opinion.apreciacion === "Bien"
+          opinion.apreciacion === "5" ||
+          opinion.apreciacion === "4"
         ) {
           positiveCount++;
         }
