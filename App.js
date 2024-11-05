@@ -13,7 +13,7 @@ enableScreens();
 import Home from "./src/screens/Home";
 import MenuRating from "./src/screens/MenuRating";
 import DataDisplay from "./src/screens/DataDisplay";
-import Profile from "./src/screens/Profile";
+import Profile from './src/screens/Profile';
 import CommonArea from "./src/screens/CommonArea";
 
 function App() {
@@ -21,6 +21,7 @@ function App() {
   const [user, setUser] = useState(null);
   const Tab = createBottomTabNavigator();
 
+  // Maneja los cambios en el estado de autenticación
   function onAuthStateChanged(user) {
     setUser(user);
     if (initializing) setInitializing(false);
@@ -28,7 +29,7 @@ function App() {
 
   useEffect(() => {
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber;
+    return subscriber; // Cancela la suscripción cuando el componente se desmonta
   }, []);
 
   if (initializing) return null;
@@ -53,6 +54,7 @@ function App() {
       });
   };
 
+  // Configuración de pestañas
   function MyTabs() {
     return (
       <Tab.Navigator>
@@ -244,23 +246,29 @@ function LoginScreen() {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.titulo}>Inicio de Sesión</Text>
+      <Text style={styles.subTitulo}>Ingrese como administrador</Text>
+      <View style={styles.anonymousButton}></View>
       <TextInput
+        style={styles.inputCont}
         placeholder="Email"
         value={email}
         onChangeText={setEmail}
         autoCapitalize="none"
-        style={styles.input}
       />
       <TextInput
+        style={styles.inputCont}
         placeholder="Contraseña"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
-        style={styles.input}
       />
+      <View style={styles.anonymousButton}></View>
       <Button title="Iniciar sesión" onPress={handleSignIn} />
+      <View style={styles.anonymousButton}></View>
       <Button title="Registrar" onPress={handleSignUp} />
       <View style={styles.anonymousButton}>
+      <View style={styles.anonymousButton}></View>
         <Button
           title="Acceso sin registro"
           onPress={handleAnonymousSignIn}
@@ -278,14 +286,28 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     padding: 16,
+    backgroundColor: "#73a9f1",
   },
-  input: {
-    borderBottomWidth: 1,
-    borderColor: "#ccc",
-    marginBottom: 16,
-    padding: 8,
+  titulo: {
+    fontSize: 45,
+    fontWeight: 'bold',
+    color: '#000',
+    fontFamily: 'serif',
+  },
+  subTitulo: {
+    fontSize: 20,
+    color: 'black',
   },
   anonymousButton: {
     marginTop: 20,
+  },
+  inputCont: {
+    borderWidth: 1,
+    borderColor: 'blue',
+    padding: 10,
+    marginTop: 20,
+    borderRadius: 20,
+    backgroundColor: '#f1f1f1',
+    fontFamily: 'serif',
   },
 });
