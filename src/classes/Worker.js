@@ -1,9 +1,15 @@
 import UserBase from "./UserBase";
-// import serveur from "./serveur";
-import { View, Text, Button, StyleSheet, FlatList } from "react-native";
-import React, { useState } from "react";
+// import {
+//   View,
+//   Text,
+//   Button,
+//   StyleSheet,
+//   FlatList,
+//   TextInput,
+// } from "react-native";
+// import React, { useState } from "react";
 
-class Worker extends UserBase {
+export default class Worker extends UserBase {
   constructor(name, email, password) {
     super(name, email, password, 1); // Tipo de usuario 1 para Trabajador
     this._completedTasks = [];
@@ -13,15 +19,15 @@ class Worker extends UserBase {
 
   //Método para manejar el cambio de texto
   manejarCambioTexto(nuevoTexto) {
-    setTexto(nuevoTexto);
+    this.setTexto(nuevoTexto);
   }
 
-  // Getter y Setter para laboresCompletadas y opiniones negativas
-  get completedTasks() {
+  // Getter y Setter para completedTasks y negativeOpinions
+  completedTasks() {
     return this._completedTasks;
   }
 
-  set completedTasks(labores) {
+  completedTasks(labores) {
     if (Array.isArray(labores)) {
       this._completedTasks = labores;
     } else {
@@ -29,43 +35,40 @@ class Worker extends UserBase {
     }
   }
 
-  get negativeOpinions() {
+  negativeOpinions() {
     return this._negativeOpinions;
   }
 
-  set negativeOpinions(opiniones) {
+  negativeOpinions(opiniones) {
     if (Array.isArray(opiniones)) {
       this._negativeOpinions = opiniones;
     } else {
-      throw new Error("Las opiniones completadas deben ser un array.");
+      throw new Error("Las opiniones deben ser un array.");
     }
   }
+
   // Método para agregar una labor a la lista de labores completadas
   addTask(labor) {
     this._completedTasks.push(labor);
   }
-  // Metodo para eliminar una opinion de la lista negra
-  eliminarElemento(texto) {
-    {
-      this._negativeOpinions.map((elemento, index) => (
-        <Text key={index} style={styles.item}>
-          {elemento}
-        </Text>
-      ));
-    }
-    if (texto === elemento.id) {
+
+  // Método para eliminar una opinión de la lista negra
+  eliminarElemento(index) {
+    if (index >= 0 && index < this._negativeOpinions.length) {
+      const elemento = this._negativeOpinions.splice(index, 1)[0];
       this._completedTasks.push(elemento);
-      this._negativeOpinions.pop(elemento);
+      console.log("Se ha marcado como completado el baño correspondiente");
+    } else {
+      console.log("Índice fuera de rango");
     }
-    const mensaje = "Se ha marcado como completado el baño correspondiente";
-    console.log(mensaje);
   }
-  // Getter y Setter para estaTrabajando
-  get isWorking() {
+
+  // Getter y Setter para isWorking
+  isWorking() {
     return this._isWorking;
   }
 
-  set isWorking(value) {
+  isWorking(value) {
     if (typeof value === "boolean") {
       this._isWorking = value;
     } else {
@@ -73,44 +76,5 @@ class Worker extends UserBase {
     }
   }
 
-  //Hace falta revisar esto
-  ///return(
-  //<View style={styles.container}>
-  //<TextInput
-  //style={styles.input}
-  //placeholder="Por favor, ingrese el ID del baño que fue atendido..."
-  //value={texto}
-  //onChangeText={manejarCambioTexto}
-  ///>
-  //<FlatList
-  //data={this._negativeOpinions}
-  //keyExtractor={(item, index) => index.toString()}
-  //renderItem={({ item, index }) => (
-  //<View style={styles.item}>
-  //<Text>{item}</Text>
-  //<Button title="Eliminar" onPress={() => eliminarElemento(index)} />
-  //</View>
-  ///)}
-  ///>
-  //</View>
-  //);
+  // Metodos de renderizacion faltantes
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  input: {
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    marginBottom: 10,
-    paddingHorizontal: 10,
-    width: "80%",
-  },
-  item: {
-    marginVertical: 10,
-  },
-});

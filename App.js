@@ -10,38 +10,98 @@ import { SafeAreaProvider } from "react-native-safe-area-context"; // SafeAreaPr
 
 enableScreens();
 
+import Worker from "./src/classes/Worker";
+
 import Home from "./src/screens/Home";
 import MenuRating from "./src/screens/MenuRating";
 import DataDisplay from "./src/screens/DataDisplay";
-import Profile from './src/screens/Profile';
+import Profile from "./src/screens/Profile";
 import CommonArea from "./src/screens/CommonArea";
+
+import messaging from "@react-native-firebase/messaging";
+import { PermissionsAndroid } from "react-native";
+PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
 
 function App() {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState(null);
+  const [worker, setWorker] = useState(null); // Guardar instancia de Worker
+  const [name, setName] = useState(""); // Capturar nombre al registrarse
+  const [password, setPassword] = useState(""); // Capturar contraseña al registrarse
+
   const Tab = createBottomTabNavigator();
 
-  // Maneja los cambios en el estado de autenticación
+  // NOTIFICACIONES
+  // async function requestUserPermission() {
+  //   const authStatus = await messaging().requestPermission();
+  //   const enabled =
+  //     authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+  //     authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+  //   if (enabled) {
+  //     console.log('Authorization status:', authStatus);
+  //   }
+  // }
+
+  // OBTENER TOKEN FCM
+  const getToken = async () => {
+    const token = await messaging().getToken();
+    console.log("TOKEN RETRIEVED =", token);
+  };
+
+  // const sendMessaging = async () => {
+  //   const message = {
+  //     notification: {
+  //       title: "Basic Notification",
+  //       body: "This is a basic notification sent from the server!",
+  //       imageUrl: "https://my-cdn.com/app-logo.png",
+  //     },
+
+  //     tokens: [${getToken()}],
+  //   };
+
+  //   try {
+  //     const response = await admin.messaging().sendEachForMulticast(message);
+  //     console.log("Successfully sent messages:", response.successCount);
+  //     console.log("Failed messages:", response.failureCount);
+  //     if (response.responses[0].error) {
+  //       console.log("First error:", response.responses[0].error);
+  //     }
+  //   } catch (error) {
+  //     console.log("Error sending messages:", error);
+  //   }
+  // };
+
+  useEffect(() => {
+    // requestUserPermission();
+    // sendMessaging();
+    getToken();
+  });
+
   function onAuthStateChanged(user) {
     setUser(user);
+    if (user && user.email && user.email.endsWith("@unimet.edu.ve")) {
+      // Crear una instancia de Worker si el usuario tiene correo institucional
+      const workerInstance = new Worker(name, user.email, password);
+      setWorker(workerInstance);
+    } else {
+      setWorker(null); // No es un usuario trabajador
+    }
     if (initializing) setInitializing(false);
   }
 
   useEffect(() => {
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber; // Cancela la suscripción cuando el componente se desmonta
+    return subscriber;
   }, []);
 
   if (initializing) return null;
 
   if (!user) {
-    return <LoginScreen />;
+    return <LoginScreen setName={setName} setPassword={setPassword} />;
   }
 
-  // Detectar el tipo de usuario
-  const isAnonymous = user.isAnonymous;
-  const isWorker = user.email && user.email.endsWith("@unimet.edu.ve");
-
+  // Logout de usuario anonimo
   const handleLogout = () => {
     auth()
       .signOut()
@@ -54,11 +114,11 @@ function App() {
       });
   };
 
-  // Configuración de pestañas
   function MyTabs() {
     return (
       <Tab.Navigator>
-        {isAnonymous ? (
+        {/* Detectar el tipo de usuario anonimo */}
+        {user.isAnonymous ? (
           // Si el usuario es anónimo, mostrar WelcomeScreen y otras pestañas limitadas
           <>
             <Tab.Screen
@@ -115,7 +175,7 @@ function App() {
             />
           </>
         ) : (
-          // Si el usuario NO es anónimo, mostrar todas las pestañas
+          // Si el usuario NO es anonimo, mostrar todas las pestañas
           <>
             <Tab.Screen
               name="Home"
@@ -133,7 +193,7 @@ function App() {
                 headerTintColor: "white",
               }}
             >
-              {() => <Home user={user} />}
+              {() => <Home user={user} worker={worker} />}
             </Tab.Screen>
             <Tab.Screen
               name="Restrooms Rating"
@@ -201,14 +261,16 @@ function App() {
   );
 }
 
-function LoginScreen() {
+function LoginScreen({ setName, setPassword }) {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [localName, setLocalName] = useState(""); // Capturar nombre localmente para pasarlo al parámetro
+  const [localPassword, setLocalPassword] = useState("");
 
   const handleSignIn = () => {
+    setPassword(localPassword); // Guardar contraseña
     auth()
-      .signInWithEmailAndPassword(email, password)
-      .then(() => Alert.alert("Usuario autenticado"))
+      .signInWithEmailAndPassword(email, localPassword)
+      .then(() => Alert.alert("Usuario autenticado!"))
       .catch((error) => {
         if (error.code === "auth/invalid-email") {
           console.log("El email ingresado no es válido");
@@ -221,8 +283,10 @@ function LoginScreen() {
   };
 
   const handleSignUp = () => {
+    setName(localName); // Guardar nombre en el estado
+    setPassword(localPassword); // Guardar contraseña en el estado
     auth()
-      .createUserWithEmailAndPassword(email, password)
+      .createUserWithEmailAndPassword(email, localPassword)
       .then(() => console.log("Cuenta de usuario creada y autenticada"))
       .catch((error) => {
         if (error.code === "auth/email-already-in-use") {
@@ -251,6 +315,12 @@ function LoginScreen() {
       <View style={styles.anonymousButton}></View>
       <TextInput
         style={styles.inputCont}
+        placeholder="Nombre"
+        value={localName}
+        onChangeText={setLocalName}
+      />
+      <TextInput
+        style={styles.inputCont}
         placeholder="Email"
         value={email}
         onChangeText={setEmail}
@@ -259,8 +329,8 @@ function LoginScreen() {
       <TextInput
         style={styles.inputCont}
         placeholder="Contraseña"
-        value={password}
-        onChangeText={setPassword}
+        value={localPassword}
+        onChangeText={setLocalPassword}
         secureTextEntry
       />
       <View style={styles.anonymousButton}></View>
@@ -268,7 +338,7 @@ function LoginScreen() {
       <View style={styles.anonymousButton}></View>
       <Button title="Registrar" onPress={handleSignUp} />
       <View style={styles.anonymousButton}>
-      <View style={styles.anonymousButton}></View>
+        <View style={styles.anonymousButton}></View>
         <Button
           title="Acceso sin registro"
           onPress={handleAnonymousSignIn}
@@ -290,24 +360,24 @@ const styles = StyleSheet.create({
   },
   titulo: {
     fontSize: 45,
-    fontWeight: 'bold',
-    color: '#000',
-    fontFamily: 'serif',
+    fontWeight: "bold",
+    color: "#000",
+    fontFamily: "serif",
   },
   subTitulo: {
     fontSize: 20,
-    color: 'black',
+    color: "black",
   },
   anonymousButton: {
     marginTop: 20,
   },
   inputCont: {
     borderWidth: 1,
-    borderColor: 'blue',
+    borderColor: "blue",
     padding: 10,
     marginTop: 20,
     borderRadius: 20,
-    backgroundColor: '#f1f1f1',
-    fontFamily: 'serif',
+    backgroundColor: "#f1f1f1",
+    fontFamily: "serif",
   },
 });

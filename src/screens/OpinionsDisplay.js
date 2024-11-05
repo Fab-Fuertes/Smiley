@@ -4,6 +4,14 @@ import { View, Text, StyleSheet } from "react-native";
 const OpinionsDisplay = ({ terminalId, opinions }) => {
   const totalOpinions = Object.keys(opinions).length;
 
+  const review = {
+    "1": "Malo",
+    "2": "Regular",
+    "3": "Bien",
+    "4": "Muy Bien",
+    "5": "Excelente",
+  }
+
   return (
     <View>
       <Text style={styles.subtitle}>{`Total de opiniones: ${totalOpinions}`}</Text>
@@ -14,7 +22,7 @@ const OpinionsDisplay = ({ terminalId, opinions }) => {
           <View key={timestamp} style={styles.opinion}>
             <Text style={styles.subtitle}>{`Fecha: ${opinion.fecha}`}</Text>
             <Text style={styles.subtitle}>{`Hora: ${opinion.hora}`}</Text>
-            <Text style={styles.subtitle}>{`Apreciación: ${opinion.apreciacion}`}</Text>
+            <Text style={styles.subtitle}>{`Apreciación: ${review[opinion.apreciacion]}`}</Text>
           </View>
         ))
       ) : (

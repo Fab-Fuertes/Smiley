@@ -36,26 +36,26 @@ app.get("/db", async (req, res) => {
   }
 });
 
-app.post("/register-worker", async (req, res) => {
-  console.log(req.body); // Agrega esto para depurar
-  const { id, name, email, password, userType } = req.body;
+// app.post("/register-worker", async (req, res) => {
+//   console.log(req.body); // Agrega esto para depurar
+//   const { id, name, email, password, userType } = req.body;
 
-  // Asegúrate de que todos los campos requeridos estén presentes
-  if (!name || !email || !password) {
-    return res.status(400).json({ error: "Faltan campos requeridos." });
-  }
+//   // Asegúrate de que todos los campos requeridos estén presentes
+//   if (!name || !email || !password) {
+//     return res.status(400).json({ error: "Faltan campos requeridos." });
+//   }
 
-  try {
-    const userRecord = await registerWorker(req.body);
-    return res.status(201).json({
-      uid: userRecord.uid,
-      message: "Trabajador registrado exitosamente.",
-    });
-  } catch (error) {
-    console.error("Error al crear usuario trabajador:", error);
-    return res.status(500).json({ error: "Error al registrar el trabajador." });
-  }
-});
+//   try {
+//     const userRecord = await registerWorker(req.body);
+//     return res.status(201).json({
+//       uid: userRecord.uid,
+//       message: "Trabajador registrado exitosamente.",
+//     });
+//   } catch (error) {
+//     console.error("Error al crear usuario trabajador:", error);
+//     return res.status(500).json({ error: "Error al registrar el trabajador." });
+//   }
+// });
 
 // Ruta para contar todas las opiniones
 app.get("/count-opinions", async (req, res) => {
@@ -75,10 +75,11 @@ app.get("/count-opinions", async (req, res) => {
 
         if (!opinionCounts[terminalId]) {
           opinionCounts[terminalId] = {
-            Bien: 0,
-            Ok: 0,
-            Regular: 0,
-            Mal: 0,
+            "5": 0,
+            "4": 0,
+            "3": 0,
+            "2": 0,
+            "1": 0,
           };
         }
 
@@ -108,10 +109,7 @@ app.get("/count-positive-opinions", async (req, res) => {
 
       for (const timestamp in opinions) {
         const opinion = opinions[timestamp];
-        if (
-          opinion.apreciacion === "5" ||
-          opinion.apreciacion === "4"
-        ) {
+        if (opinion.apreciacion === "4" || opinion.apreciacion === "5") {
           positiveCount++;
         }
       }
@@ -150,10 +148,7 @@ const monitorReactions = () => {
           let negativeReactions = 0;
 
           Object.values(opinionsData).forEach((opinion) => {
-            if (
-              opinion.apreciacion === "Mal" ||
-              opinion.apreciacion === "Regular"
-            ) {
+            if (opinion.apreciacion === "1" || opinion.apreciacion === "2") {
               negativeReactions++;
             }
           });
@@ -169,13 +164,54 @@ const monitorReactions = () => {
   });
 };
 
-const sendAlert = (terminalId, reaccionesNegativas, umbral) => {
-  const mensaje = `El terminal ${terminalId} ha superado el umbral de reacciones negativas (Neg: ${reaccionesNegativas}/ Umbral:${umbral}). Se requiere atención de mantenimiento.`;
+const sendAlert = async (terminalId, reaccionesNegativas, umbral) => {
+  const mensaje = `El terminal '${terminalId}' saltó una alerta de reacciones negativas\nCantidad: ${reaccionesNegativas} / Umbral: ${umbral}\nSe requiere atención de mantenimiento!`;
   console.log(mensaje);
-};
 
-// Iniciar el monitoreo de reacciones
-monitorReactions();
+  try {
+    // Obtener el token de registro del dispositivo asociado al terminal o usuario
+    const tokenSnapshot = await admin
+      .database()
+      .ref(`tokens/${terminalId}`)
+      .once("value");
+    const deviceToken = tokenSnapshot.val();
+
+    // Si no hay token, no se envia la notificacion
+    if (!deviceToken) {
+      console.log(
+        `No se encontro token de registro para el terminal ${terminalId}`
+      );
+      return;
+    }
+
+    // Configuracion de la notificacion
+    const payload = {
+      notification: {
+        title: "Alerta de Mantenimiento",
+        body: mensaje,
+      },
+      data: {
+        terminalId: terminalId,
+        reaccionesNegativas: reaccionesNegativas.toString(),
+        umbral: umbral.toString(),
+      },
+    };
+
+    // Opcional: Configuracion adicional, por ejemplo, prioridad de la noti
+    const options = {
+      priority: "high",
+      timeToLive: 60 * 60 * 24, // 1 día
+    };
+
+    // Enviar la notif FCM
+    await admin.messaging().sendToDevice(deviceToken, payload, options);
+    console.log(
+      `Notificacion enviada a ${deviceToken} para el terminal ${terminalId}`
+    );
+  } catch (error) {
+    console.error("Error enviando la notificacion:", error);
+  }
+};
 
 // Ruta para actualizar el umbral
 app.post("/update-dynamic-threshold", async (req, res) => {
@@ -250,67 +286,70 @@ wss.on("connection", (ws) => {
   });
 });
 
-// Funcion de prueba para simular una nueva opinion
-const simulateOpinion = async () => {
-  const terminalId = "00001"; // Cambia al ID correspondiente
-  const opinionsRef = admin.database().ref(`opiniones/${terminalId}`);
+// // Funcion de prueba para simular una nueva opinion
+// const simulateOpinion = async () => {
+//   const terminalId = "00001"; // Cambia al ID correspondiente
+//   const opinionsRef = admin.database().ref(`opiniones/${terminalId}`);
 
-  try {
-    const snapshot = await opinionsRef.once("value");
-    const existingOpinions = snapshot.val() || {};
-    const totalOpinions = Object.keys(existingOpinions).length;
+//   try {
+//     const snapshot = await opinionsRef.once("value");
+//     const existingOpinions = snapshot.val() || {};
+//     const totalOpinions = Object.keys(existingOpinions).length;
 
-    // Si el total de opiniones es menor a un cierto límite, se permite agregar una nueva
-    if (totalOpinions < 100) {
-      // Cambia 100 al límite deseado
-      const newOpinion = {
-        apreciacion: Math.random() > 0.5 ? "Bien" : "Mal", // Genera aleatoriamente "Bien" o "Mal"
-        fecha: new Date().toISOString().split("T")[0],
-        hora: new Date().toISOString().split("T")[1].split(".")[0],
-        id: terminalId,
-      };
+//     // Si el total de opiniones es menor a un cierto límite, se permite agregar una nueva
+//     if (totalOpinions < 100) {
+//       // Cambia 100 al límite deseado
+//       const newOpinion = {
+//         apreciacion: Math.random() > 0.5 ? "Bien" : "Mal", // Genera aleatoriamente "Bien" o "Mal"
+//         fecha: new Date().toISOString().split("T")[0],
+//         hora: new Date().toISOString().split("T")[1].split(".")[0],
+//         id: terminalId,
+//       };
 
-      await opinionsRef.push(newOpinion); // Agrega la nueva opinión a Firebase
-      console.log("Nueva opinión añadida:", newOpinion);
-    } else {
-      console.log(
-        `Límite de opiniones alcanzado para el terminal ${terminalId}.`
-      );
-    }
-  } catch (error) {
-    console.error("Error al simular opinión:", error);
-  }
-};
+//       await opinionsRef.push(newOpinion); // Agrega la nueva opinión a Firebase
+//       console.log("Nueva opinión añadida:", newOpinion);
+//     } else {
+//       console.log(
+//         `Límite de opiniones alcanzado para el terminal ${terminalId}.`
+//       );
+//     }
+//   } catch (error) {
+//     console.error("Error al simular opinión:", error);
+//   }
+// };
 
 // setInterval(simulateOpinion, 15000); // cada 15 segundos
 
-async function registerWorker(workerData) {
-  try {
-    const { name, email, password, userType } = workerData;
+// async function registerWorker(workerData) {
+//   try {
+//     const { name, email, password, userType } = workerData;
 
-    // Crear el usuario en Firebase Authentication
-    const userRecord = await admin.auth().createUser({
-      email: email,
-      password: password,
-      displayName: name,
-    });
+//     // Crear el usuario en Firebase Authentication
+//     const userRecord = await admin.auth().createUser({
+//       email: email,
+//       password: password,
+//       displayName: name,
+//     });
 
-    // Asignar el tipo de usuario como reclamo personalizado
-    await admin
-      .auth()
-      .setCustomUserClaims(userRecord.uid, { userType: userType });
+//     // Asignar el tipo de usuario como reclamo personalizado
+//     await admin
+//       .auth()
+//       .setCustomUserClaims(userRecord.uid, { userType: userType });
 
-    console.log("Usuario trabajador creado:", userRecord.uid);
-    return userRecord;
-  } catch (error) {
-    console.error("Error al crear usuario trabajador:", error);
-    throw error;
-  }
-}
+//     console.log("Usuario trabajador creado:", userRecord.uid);
+//     return userRecord;
+//   } catch (error) {
+//     console.error("Error al crear usuario trabajador:", error);
+//     throw error;
+//   }
+// }
+
+// Iniciar el monitoreo de reacciones
+monitorReactions();
 
 // Escuchar en el puerto
 server.listen(port, () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);
 });
 
-module.exports = { registerWorker };
+// module.exports = { registerWorker };

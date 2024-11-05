@@ -1,17 +1,30 @@
-import { Text, Image, StyleSheet, View, ScrollView, Button } from "react-native";
+import {
+  Text,
+  Image,
+  StyleSheet,
+  View,
+  ScrollView,
+  Button,
+  Alert,
+} from "react-native";
 import React, { useState, useEffect } from "react";
 import auth from "@react-native-firebase/auth";
 
-export default function Home({ user, accessType }) {
+export default function Home({ user, worker }) {
   const handleSignOut = () => {
-    auth().signOut();
+    auth()
+      .signOut()
+      .then(() => {
+        Alert.alert("Has cerrado sesión...");
+      });
   };
 
   return (
     <ScrollView>
       <View style={styles.container}>
         <Text style={styles.title}>SMILEY</Text>
-        <Text style={styles.welcomeText}>Bienvenido {user.email}</Text>
+        <Text style={styles.welcomeText}>Bienvenido {worker.getName()}!</Text>
+        <Text style={styles.texto2}>Email: {worker.getEmail()}</Text>
         <Text style={styles.texto2}>
           Transformando la experiencia de cada visita
         </Text>
@@ -48,14 +61,14 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "white",
     marginBottom: 15,
-    fontFamily: 'serif',
+    fontFamily: "serif",
   },
   texto2: {
     fontSize: 15,
     fontWeight: "bold",
     color: "white",
     marginBottom: 25,
-    fontFamily: 'serif',
+    fontFamily: "serif",
   },
   slogan2: {
     fontSize: 18,
@@ -63,7 +76,7 @@ const styles = StyleSheet.create({
     color: "white",
     textAlign: "center",
     marginBottom: 25,
-    fontFamily: 'serif',
+    fontFamily: "serif",
   },
   slogan: {
     fontSize: 18,
@@ -71,7 +84,7 @@ const styles = StyleSheet.create({
     color: "white",
     textAlign: "justify",
     marginBottom: 15,
-    fontFamily: 'serif',
+    fontFamily: "serif",
   },
   image: {
     width: 300,
@@ -81,8 +94,8 @@ const styles = StyleSheet.create({
   },
   welcomeText: {
     fontSize: 20,
-    fontWeight: 'bold',
-    fontFamily: 'serif',
+    fontWeight: "bold",
+    fontFamily: "serif",
     fontStyle: "italic",
   },
 });
