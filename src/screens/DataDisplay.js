@@ -101,7 +101,7 @@ export default function DataDisplay() {
 
             return (
               <View key={terminalKey}>
-                <Text style={styles.item}>{`Terminal ID: ${terminalId}`}</Text>
+                <Text style={styles.item}>{`Corimon piso (${terminalId})`}</Text>
 
                 <OpinionsDisplay
                   terminalId={terminalData.ID}
@@ -116,6 +116,9 @@ export default function DataDisplay() {
                   terminalId={terminalData.ID}
                   refreshData={refreshData}
                 />
+                <View style={styles.anonymousButton}></View>
+                <View style={styles.anonymousButton}></View>
+                <View style={styles.anonymousButton}></View>
               </View>
             );
           })
@@ -131,12 +134,14 @@ export default function DataDisplay() {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#007BFF",
   },
   title: {
-    fontSize: 18,
+    fontSize: 30,
     fontWeight: "bold",
     marginBottom: 10,
+    fontFamily: 'serif',
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
@@ -144,8 +149,14 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   item: {
-    fontSize: 14,
+    fontSize: 24,
+    fontWeight: 'bold',
+    fontStyle: 'italic',
     paddingVertical: 5,
+    fontFamily: 'serif',
+  },
+  anonymousButton: {
+    marginTop: 20,
   },
 });
 
