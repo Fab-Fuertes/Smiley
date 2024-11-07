@@ -3,7 +3,7 @@ export default class UserBase {
     this._name = name;
     this._email = email;
     this._password = password;
-    this.userType = userType; // Tipo de usuario
+    this._userType = userType; // Tipo de usuario
   }
 
   // Método común para todos los usuarios
@@ -31,5 +31,9 @@ export default class UserBase {
 
   setPassword(newPassword) {
     this._password = newPassword;
+  }
+
+  getUserType(){
+    this._userType;
   }
 }

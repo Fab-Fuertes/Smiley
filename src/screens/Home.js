@@ -10,7 +10,8 @@ import {
 import React, { useState, useEffect } from "react";
 import auth from "@react-native-firebase/auth";
 
-export default function Home({ user, worker }) {
+export default function Home({ user }) {
+
   const handleSignOut = () => {
     auth()
       .signOut()
@@ -23,8 +24,19 @@ export default function Home({ user, worker }) {
     <ScrollView>
       <View style={styles.container}>
         <Text style={styles.title}>SMILEY</Text>
-        <Text style={styles.welcomeText}>Bienvenido {worker.getName()}!</Text>
-        <Text style={styles.texto2}>Email: {worker.getEmail()}</Text>
+        {user ? (
+          <>
+            <Text style={styles.welcomeText}>
+              Bienvenido {user.displayName ? user.displayName : "usuario"}!
+            </Text>
+            <Text style={styles.texto2}>Email: {user.email}</Text>
+          </>
+        ) : (
+          <Text style={styles.welcomeText}>
+            Bienvenido, usuario no identificado
+          </Text>
+        )}
+
         <Text style={styles.texto2}>
           Transformando la experiencia de cada visita
         </Text>

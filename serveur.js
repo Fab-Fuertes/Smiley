@@ -75,11 +75,11 @@ app.get("/count-opinions", async (req, res) => {
 
         if (!opinionCounts[terminalId]) {
           opinionCounts[terminalId] = {
-            "5": 0,
-            "4": 0,
-            "3": 0,
-            "2": 0,
-            "1": 0,
+            5: 0,
+            4: 0,
+            3: 0,
+            2: 0,
+            1: 0,
           };
         }
 
@@ -234,8 +234,8 @@ app.post("/update-dynamic-threshold", async (req, res) => {
 
           Object.values(opinionsData).forEach((opinion) => {
             if (
-              opinion.apreciacion === "Mal" ||
-              opinion.apreciacion === "Regular"
+              opinion.apreciacion === "1" ||
+              opinion.apreciacion === "2"
             ) {
               negativeReactions++;
             }
