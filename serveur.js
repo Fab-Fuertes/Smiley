@@ -18,65 +18,70 @@ const PORT = process.env.PORT || 8001;
 
 //const path = require("path");
 
+/**
+ * Aqui se invocan las RUTAS
+ */
+// localhost/api/____
+app.use("/api", require("./routes"));
 
 // Ruta para obtener un mensaje simple
 app.get("/", async (req, res) => {
   res.json("hiiii we working on another dimension");
 });
 
-// Ruta para obtener todos los datos de la base de datos
-app.get('/data', async (req, res) => {
-  try {
-    const snapshot = await admin.database().ref('/').once('value');
-    const data = snapshot.val();
-    res.json(data);
-  } catch (error) {
-    console.error('Error al obtener datos:', error);
-    res.status(500).send('Error al obtener datos');
-  }
-});
+// app.get("/", async (req, res) => {
+//   try {
+//     const snapshot = await admin.database().ref("/").once("value");
+//     const data = snapshot.val();
+//     res.json(data);
+//   } catch (error) {
+//     console.error("Error al obtener datos:", error);
+//     res.status(500).send("Error al obtener datos");
+//   }
+// });
 
 // Escuchar en el puerto
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
 
-app.post("/login", async (req, res) => {
-  try {
-    console.log(req.body);
-    const userId = await logIn(req.body.tokenID); // Espera a que signUp resuelva la promesa
-    if (userId) {
-      res.status(200).send({
-        message: "Usuario",
-        userId: userId,
-        user: req.body.tokenID.user.uid,
-      });
-    } else {
-      res.status(400).send({ message: "Error al  usuario" });
-    }
-  } catch (error) {
-    console.error("Error al  usuario: ", error);
-  }
-});
+// // Nuevas rutas por probar
+// app.post("/login", async (req, res) => {
+//   try {
+//     console.log(req.body);
+//     const userId = await logIn(req.body.tokenID); // Espera a que signUp resuelva la promesa
+//     if (userId) {
+//       res.status(200).send({
+//         message: "Usuario",
+//         userId: userId,
+//         user: req.body.tokenID.user.uid,
+//       });
+//     } else {
+//       res.status(400).send({ message: "Error al  usuario" });
+//     }
+//   } catch (error) {
+//     console.error("Error al  usuario: ", error);
+//   }
+// });
 
-app.post("/signUp", async (req, res) => {
-  // console.log("entro")
-  // console.log()
-  // const array= req.body["Datos"];
-  try {
-    const userId = await signUp(req.body); // Espera a que signUp resuelva la promesa
+// app.post("/signUp", async (req, res) => {
+//   // console.log("entro")
+//   // console.log()
+//   // const array= req.body["Datos"];
+//   try {
+//     const userId = await signUp(req.body); // Espera a que signUp resuelva la promesa
 
-    if (userId) {
-      res
-        .status(200)
-        .send({ message: "Usuario registrado con éxito", userId: userId });
-    } else if (userId == null) {
-      res.status(400).send({ message: "Usuario ya registrado" });
-    } else {
-      res.status(400).send({ message: "Error al registrar usuario" });
-    }
-  } catch (error) {
-    console.error("Error al registrar usuario: ", error);
-    res.status(500).send("Error al registrar usuario");
-  }
-});
+//     if (userId) {
+//       res
+//         .status(200)
+//         .send({ message: "Usuario registrado con éxito", userId: userId });
+//     } else if (userId == null) {
+//       res.status(400).send({ message: "Usuario ya registrado" });
+//     } else {
+//       res.status(400).send({ message: "Error al registrar usuario" });
+//     }
+//   } catch (error) {
+//     console.error("Error al registrar usuario: ", error);
+//     res.status(500).send("Error al registrar usuario");
+//   }
+// });
