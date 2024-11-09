@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, Button, TextInput, Alert, StyleSheet } from "react-native";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+//import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+//import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { enableScreens } from "react-native-screens";
 
 enableScreens();
@@ -12,11 +12,11 @@ import CommonArea from "./src/screens/CommonArea";
 import LoginScreen from "./src/screens/LoginScreen";
 import RegisterScreen from "./src/screens/RegisterScreen";
 
-import messaging from "@react-native-firebase/messaging";
+//import messaging from "@react-native-firebase/messaging";
 import { PermissionsAndroid } from "react-native";
 import { AuthProvider, useAuth } from "./src/context/AuthContext";
 import { SafeAreaProvider } from "react-native-safe-area-context"; // SafeAreaProvider
-import auth from "@react-native-firebase/auth";
+//import auth from "@react-native-firebase/auth";
 
 PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
 
@@ -65,7 +65,7 @@ const MainApp = () => {
 
   return (
     <View style={styles.container}>
-      {user.isGuest ? <CommonArea onLogout={logout} /> : <Home user={user} />}
+      {user.isGuest ? <CommonArea onLogout={logout} /> : <Home />}
       <Button title="Cerrar sesión" onPress={logout} color="#FF0000" />
     </View>
   );

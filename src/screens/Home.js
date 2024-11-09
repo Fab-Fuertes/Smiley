@@ -8,9 +8,9 @@ import {
   Alert,
 } from "react-native";
 import React, { useState, useEffect } from "react";
-import auth from "@react-native-firebase/auth";
+//import auth from "@react-native-firebase/auth";
 
-export default function Home({ user }) {
+export default function Home() {
 
   const handleSignOut = () => {
     auth()
