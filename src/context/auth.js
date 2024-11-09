@@ -1,4 +1,4 @@
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword } from "@firebase/auth";
 import { auth } from "../../firebaseConfig";
 
 export async function signInWithEmailAndPasswordAndFetchUserData(email, password) {

@@ -1,4 +1,4 @@
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword } from '@firebase/auth';
 import {auth, firestore} from "../../firebaseConfig";
 
 import Worker from "../classes/Worker"; // Importa la clase para instanciar
