@@ -10,11 +10,17 @@ import UserBase from "./UserBase";
 // import React, { useState } from "react";
 
 export default class Worker extends UserBase {
-  constructor(name, email, password) {
-    super(name, email, password, 1); // Tipo de usuario 1 para Trabajador
+  constructor(name,last_name, email, phone) {
+    super(name, last_name, email, phone, 1); // Tipo de usuario 1 para Trabajador
+    // New attributes
+    this._createdAt = new Date();
     this._completedTasks = [];
     this._negativeOpinions = [];
     this._isWorking = false;
+  }
+
+  getCreatedAt(){
+    return this._createdAt;
   }
 
   //Método para manejar el cambio de texto

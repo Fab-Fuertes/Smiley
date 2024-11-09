@@ -33,57 +33,40 @@ export default function App() {
 }
 
 const MainApp = () => {
-  const [user, setUser] = useState(null);
+  const { user, isAuthenticated, login, logout, registerUser } = useAuth();
   const [isLoginScreen, setIsLoginScreen] = useState(true);
-  const [isGuest, setIsGuest] = useState(false); // Nuevo estado para modo invitado
-  const [password, setPassword] = useState("");
-  //const { login } = useAuth();
 
-  useEffect(() => {
-    const subscriber = auth().onAuthStateChanged((authUser) => {
-      setUser(authUser);
-      setIsGuest(authUser && authUser.isAnonymous); // Detecta si el usuario es invitado
-    });
-    return subscriber;
-  }, []);
-
-  const handleLogout = () => {
-    auth()
-      .signOut()
-      .then(() => {
-        Alert.alert("Has cerrado sesión");
-        setUser(null);
-        setIsGuest(false);
-      });
-  };
-
-  const handleRegisterSucces = () => {
-    // Cuando el registro sea exitoso, navegar a Home y actualizar el estado
-    setUser(auth.currentUser);
-  };
-
-  if (!user) {
+  if (!isAuthenticated) {
     return isLoginScreen ? (
       <LoginScreen
-        setPassword={setPassword}
-        onLoginSuccess={() => setUser(auth().currentUser)}
-        onGuestLogin={() => setIsGuest(true)} // Activa el modo invitado
+        onLogin={async (email, password) => {
+          try {
+            await login(email, password);
+          } catch (error) {
+            Alert.alert("Error", "Credenciales no válidas");
+          }
+        }}
         navigateToRegister={() => setIsLoginScreen(false)}
       />
     ) : (
       <RegisterScreen
-        setPassword={setPassword}
-        onRegisterSuccess={handleRegisterSucces}
+        onRegister={async (data) => {
+          try {
+            await registerUser(data);
+            setIsLoginScreen(true);
+          } catch (error) {
+            Alert.alert("Error", "No se pudo completar el registro");
+          }
+        }}
         navigateToLogin={() => setIsLoginScreen(true)}
       />
     );
   }
 
-  // Muestra CommonArea si el usuario es invitado, sino muestra Home
   return (
     <View style={styles.container}>
-      {isGuest ? <CommonArea onLogout={handleLogout} /> : <Home user={user} />}
-      <Button title="Cerrar sesión" onPress={handleLogout} color="#FF0000" />
+      {user.isGuest ? <CommonArea onLogout={logout} /> : <Home user={user} />}
+      <Button title="Cerrar sesión" onPress={logout} color="#FF0000" />
     </View>
   );
 };

@@ -11,7 +11,6 @@ export const useAuth = () => {
   return context;
 };
 
-// Funcion encargada de recibir la informacion de autenticacion
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
@@ -29,10 +28,12 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Función para registrar un usuario
-  const registerUser = async (email, password, nombre) => {
+  const registerUser = async (email, password, name, last_name, phone, role) => {
     try {
-      const newUser = await signUpAWorker(email, password, nombre);
-      login(newUser);
+      const newUser = await signUpAWorker(email, password, name, last_name, phone, role);
+      if (newUser) {
+        login(newUser); // Inicia sesión automáticamente después del registro
+      }
     } catch (error) {
       console.error("Error al registrar el usuario:", error);
     }
@@ -43,10 +44,8 @@ export const AuthProvider = ({ children }) => {
     user,
     login,
     logout,
-    registerUser
+    registerUser,
   };
 
-  return (
-    <AuthContext.Provider value={{ value }}>{children}</AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

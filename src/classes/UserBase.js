@@ -1,8 +1,9 @@
 export default class UserBase {
-  constructor(name, email, password, userType) {
+  constructor(name, last_name, email, phone, userType) {
     this._name = name;
+    this._last_name = last_name;
     this._email = email;
-    this._password = password;
+    this._phone = phone;
     this._userType = userType; // Tipo de usuario
   }
 
@@ -21,6 +22,14 @@ export default class UserBase {
     this._name = newName;
   }
 
+  getLastName() {
+    return this._last_name;
+  }
+
+  setLastName(newLastName) {
+    this._last_name = newLastName;
+  }
+
   getEmail() {
     return this._email;
   }
@@ -29,11 +38,15 @@ export default class UserBase {
     this._email = newEmail;
   }
 
-  setPassword(newPassword) {
-    this._password = newPassword;
+  getPhoneNumber() {
+    return this._phone;
   }
 
-  getUserType(){
+  setPhoneNumber(newPhone) {
+    this._phone = newPhone;
+  }
+
+  getUserType() {
     this._userType;
   }
 }

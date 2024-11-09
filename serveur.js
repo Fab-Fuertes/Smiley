@@ -3,7 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const axios = require("axios");
 const bodyParser = require("body-parser");
-const admin = require("./databaseConfig");
+const admin = require("./firebaseConfig");
 
 // Acceso a la base de datos
 const app = express();

@@ -1,4 +1,3 @@
-// RegisterScreen.js
 import React, { useState } from "react";
 import {
   View,
@@ -9,53 +8,36 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
-
-// import auth from "@react-native-firebase/auth";
 import { useAuth } from "../context/AuthContext";
-//import { signUpAWorker } from "../context/AuthenticationService";
 
-export default function RegisterScreen({
-  setName,
-  setPassword,
-  onRegisterSuccess,
-  navigateToLogin,
-}) {
+export default function RegisterScreen({ onRegisterSuccess, navigateToLogin }) {
   const { registerUser } = useAuth();
   const [email, setEmail] = useState("");
   const [localName, setLocalName] = useState("");
+  const [lastName, setLastName] = useState(""); // Nuevo campo para el apellido
+  const [phone, setPhone] = useState(""); // Nuevo campo para el teléfono
   const [localPassword, setLocalPassword] = useState("");
 
   const handleSignUp = async () => {
-    //event.preventDefault();
-
     if (localPassword.length < 6) {
       Alert.alert("Error", "La contraseña debe tener al menos 6 caracteres");
       return;
     }
 
-    if (!email || !localPassword) {
-      Alert.alert(
-        "Error",
-        "La contraseña y correo son campos requeridos para su registro."
-      );
-      return;
-    }
-
-    if(!localName){
-        Alert.alert("Error", "Por favor ingrese su nombre.");
+    if (!email || !localPassword || !localName || !lastName || !phone) {
+      Alert.alert("Error", "Todos los campos son obligatorios.");
       return;
     }
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      Alert.alert("Error","Por favor ingrese un correo valido.");
+      Alert.alert("Error", "Por favor ingrese un correo válido.");
       return;
     }
 
     try {
-      await registerUser(email, localPassword, localName);
+      await registerUser(email, localPassword, localName, lastName, phone);
       Alert.alert("Cuenta de usuario creada satisfactoriamente!");
       onRegisterSuccess();
-
     } catch (error) {
       Alert.alert("Error", error.message);
     }
@@ -69,6 +51,19 @@ export default function RegisterScreen({
         placeholder="Nombre"
         value={localName}
         onChangeText={setLocalName}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Apellido"
+        value={lastName}
+        onChangeText={setLastName}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Teléfono"
+        value={phone}
+        onChangeText={setPhone}
+        keyboardType="phone-pad"
       />
       <TextInput
         style={styles.input}
