@@ -7,29 +7,34 @@ import {
   Button,
   Alert,
 } from "react-native";
-import React, { useState, useEffect } from "react";
-//import auth from "@react-native-firebase/auth";
+import React from "react";
+import { useAuth } from "../context/AuthContext"; // Importamos el contexto de autenticación
 
 export default function Home() {
+  const { user, logout } = useAuth();
 
-  const handleSignOut = () => {
-    auth()
-      .signOut()
-      .then(() => {
-        Alert.alert("Has cerrado sesión...");
-      });
+  const handleSignOut = async () => {
+    try {
+      await logout();
+      Alert.alert("Has cerrado sesión... Hasta la próxima!");
+    } catch (error) {
+      Alert.alert("Error", "No se pudo cerrar sesión");
+    }
   };
 
   return (
-    <ScrollView>
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
         <Text style={styles.title}>SMILEY</Text>
         {user ? (
           <>
             <Text style={styles.welcomeText}>
-              Bienvenido {user.displayName ? user.displayName : "usuario"}!
+              Bienvenido {user.name ? user.name : "usuario"}!
             </Text>
             <Text style={styles.texto2}>Email: {user.email}</Text>
+            <Text style={styles.texto2}>
+              Teléfono: {user.phone || "No disponible"}
+            </Text>
           </>
         ) : (
           <Text style={styles.welcomeText}>
@@ -61,6 +66,10 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: "center",
+  },
   container: {
     flex: 1,
     backgroundColor: "#007BFF",
@@ -109,5 +118,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontFamily: "serif",
     fontStyle: "italic",
+    marginBottom: 10,
   },
 });

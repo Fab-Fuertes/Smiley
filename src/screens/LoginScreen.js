@@ -7,16 +7,13 @@ import {
   Alert,
   StyleSheet,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { useAuth } from "../context/AuthContext"; // Usamos el contexto de autenticación
-import {signInWithEmailAndPasswordAndFetchUserData} from '../context/auth';
-import Worker from '../classes/Worker';
+import Worker from "../classes/Worker";
+import { signInAWorker } from "../context/AuthenticationService";
 
-export default function LoginScreen({
-  onLoginSuccess,
-  navigateToRegister,
-  onGuestLogin,
-}) {
+export default function LoginScreen({ onLoginSuccess, navigateToRegister }) {
   const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -33,7 +30,7 @@ export default function LoginScreen({
 
     try {
       // Autenticar al usuario y obtener su ID
-      const userId = await signInWithEmailAndPasswordAndFetchUserData(
+      const userId = await signInAWorker(
         email,
         password
       );
@@ -64,11 +61,10 @@ export default function LoginScreen({
 
         // Crear un nuevo objeto Worker y asignarlo al contexto
         const worker = new Worker(
-          userId,
           userData.name,
-          userData.email,
           userData.lastname,
-          userData.phone,
+          userData.email,
+          userData.phone
         );
         login(worker);
         Alert.alert("Éxito", "Inicio de sesión exitoso");
@@ -100,48 +96,52 @@ export default function LoginScreen({
         onChangeText={setPassword}
         secureTextEntry
       />
-      <Button
-        title="Iniciar sesión"
-        onPress={handleLogin}
-        disabled={isLoading}
-      />
-
+      <View style={styles.buttonContainer}>
+        <Button
+          title="Iniciar sesión"
+          onPress={handleLogin}
+          disabled={isLoading}
+        />
+      </View>
       {isLoading && <ActivityIndicator size="large" color="#0000ff" />}
-
       <TouchableOpacity onPress={navigateToRegister}>
         <Text style={styles.registerText}>
           ¿No tienes cuenta? Regístrate aquí!
         </Text>
       </TouchableOpacity>
-
-      <Button
-      styles={styles.anonymousButtonContainer}
-        title="Acceder como invitado"
-        onPress={onGuestLogin}
-        color="#808080"
-      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "space-between", padding: 16 },
-  formContainer: { flex: 1, justifyContent: "center" },
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    padding: 16,
+    backgroundColor: "#f0f0f0",
+  },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 16,
     textAlign: "center",
   },
-  input: { borderWidth: 1, borderRadius: 8, padding: 10, marginVertical: 10 },
+  input: {
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 10,
+    marginVertical: 10,
+    backgroundColor: "#fff",
+  },
+  buttonContainer: {
+    marginTop: 20,
+    marginBottom: 20,
+  },
   registerText: {
     color: "blue",
     marginTop: 15,
     textAlign: "center",
     fontSize: 16,
     textDecorationLine: "underline",
-  },
-  anonymousButtonContainer: {
-    marginBottom: 69,
   },
 });

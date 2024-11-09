@@ -1,24 +1,17 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, Button, TextInput, Alert, StyleSheet } from "react-native";
-//import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import React, { useState } from "react";
+import { View, Button, Alert, StyleSheet } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
-//import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { enableScreens } from "react-native-screens";
-
-enableScreens();
 
 import Home from "./src/screens/Home";
 import CommonArea from "./src/screens/CommonArea";
 import LoginScreen from "./src/screens/LoginScreen";
 import RegisterScreen from "./src/screens/RegisterScreen";
 
-//import messaging from "@react-native-firebase/messaging";
-import { PermissionsAndroid } from "react-native";
 import { AuthProvider, useAuth } from "./src/context/AuthContext";
-import { SafeAreaProvider } from "react-native-safe-area-context"; // SafeAreaProvider
-//import auth from "@react-native-firebase/auth";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
-PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
+enableScreens();
 
 export default function App() {
   return (
@@ -36,28 +29,32 @@ const MainApp = () => {
   const { user, isAuthenticated, login, logout, registerUser } = useAuth();
   const [isLoginScreen, setIsLoginScreen] = useState(true);
 
+  const handleLogin = async (email, password) => {
+    try {
+      await login(email, password);
+    } catch (error) {
+      Alert.alert("Error", "Credenciales no válidas");
+    }
+  };
+
+  const handleRegister = async (data) => {
+    try {
+      await registerUser(data);
+      setIsLoginScreen(true);
+    } catch (error) {
+      Alert.alert("Error", "No se pudo completar el registro");
+    }
+  };
+
   if (!isAuthenticated) {
     return isLoginScreen ? (
       <LoginScreen
-        onLogin={async (email, password) => {
-          try {
-            await login(email, password);
-          } catch (error) {
-            Alert.alert("Error", "Credenciales no válidas");
-          }
-        }}
+        onLogin={handleLogin}
         navigateToRegister={() => setIsLoginScreen(false)}
       />
     ) : (
       <RegisterScreen
-        onRegister={async (data) => {
-          try {
-            await registerUser(data);
-            setIsLoginScreen(true);
-          } catch (error) {
-            Alert.alert("Error", "No se pudo completar el registro");
-          }
-        }}
+        onRegister={handleRegister}
         navigateToLogin={() => setIsLoginScreen(true)}
       />
     );
@@ -65,8 +62,10 @@ const MainApp = () => {
 
   return (
     <View style={styles.container}>
-      {user.isGuest ? <CommonArea onLogout={logout} /> : <Home />}
-      <Button title="Cerrar sesión" onPress={logout} color="#FF0000" />
+      <Home />
+      <View style={styles.logoutButtonContainer}>
+        <Button title="Cerrar sesión" onPress={logout} color="#FF0000" />
+      </View>
     </View>
   );
 };
@@ -78,26 +77,8 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: "#73a9f1",
   },
-  titulo: {
-    fontSize: 45,
-    fontWeight: "bold",
-    color: "#000",
-    fontFamily: "serif",
-  },
-  subTitulo: {
-    fontSize: 20,
-    color: "black",
-  },
-  anonymousButton: {
+  logoutButtonContainer: {
     marginTop: 20,
-  },
-  inputCont: {
-    borderWidth: 1,
-    borderColor: "blue",
-    padding: 10,
-    marginTop: 20,
-    borderRadius: 20,
-    backgroundColor: "#f1f1f1",
-    fontFamily: "serif",
+    alignItems: "center",
   },
 });
