@@ -4,7 +4,6 @@
   "main": "expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
-    "backend": "nodemon serveur.js",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web"
@@ -16,8 +15,6 @@
     "@firebase/auth": "^1.8.0",
     "@firebase/firestore": "^4.7.4",
     "@react-native-async-storage/async-storage": "^1.24.0",
-    "@react-native-firebase/app": "^21.4.0",
-    "@react-native-firebase/auth": "^21.4.0",
     "@react-navigation/bottom-tabs": "^6.6.1",
     "@react-navigation/native": "^6.1.18",
     "@react-navigation/stack": "^6.4.1",
