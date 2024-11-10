@@ -1,23 +1,22 @@
 const { auth, admin } = require("./databaseConfig"); // Asegúrate de que apunta al archivo correcto
 
-async function logIn({ email, password }) {
+async function logIn(tokenID) {
   try {
-    // Primero, autentica al usuario con email y password
-    const userCredential = await admin.auth().getUserByEmail(email);
-    if (!userCredential) {
-      throw new Error("Credenciales no válidas");
-    }
+    // Verificar el tokenID con Firebase Admin y obtener el UID del usuario
+    const decodedToken = await admin.auth().verifyIdToken(tokenID);
+    const uid = decodedToken.uid;
 
-    // Si el usuario existe, genera un token personalizado basado en su UID
-    const uid = userCredential.uid;
-    const idToken = await auth.createCustomToken(uid);
-
-    // Obtener los datos del usuario desde Firestore
+    // Obtener los datos del usuario desde Firestore usando el UID
     const docRef = admin.firestore().collection("workers").doc(uid);
     const docSnap = await docRef.get();
     const userData = docSnap.exists ? docSnap.data() : null;
 
-    return { idToken, userId: uid, userData };
+    // Verificar si se obtuvieron los datos del usuario
+    if (!userData) {
+      throw new Error("Usuario no encontrado en la colección 'workers'");
+    }
+
+    return { userId: uid, userData };
   } catch (error) {
     console.error("Error al iniciar sesión:", error.message);
     return null;

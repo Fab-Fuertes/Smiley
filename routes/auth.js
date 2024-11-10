@@ -27,14 +27,14 @@ router.post("/signup", async (req, res) => {
 
 // Ruta para el inicio de sesión de usuarios
 router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+  const { tokenID } = req.body;
+  console.log("Token recibido en backend:", tokenID);
   try {
-    const loginResponse = await logIn({ email, password });
+    const loginResponse = await logIn(tokenID);
     if (loginResponse) {
       res.status(200).json({
         message: "Inicio de sesión exitoso",
         userId: loginResponse.userId,
-        token: loginResponse.idToken,
         userData: loginResponse.userData,
       });
     } else {
