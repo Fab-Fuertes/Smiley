@@ -38,15 +38,16 @@ async function emailVerification(email) {
 
 async function signUpWorker(data) {
   try {
+    // Verifica si el email ya está registrado
     const existingUser = await emailVerification(data.email);
-    console.log("Resultado de la verificación de correo:", existingUser); // Para verificar si el correo ya existe.
-
     if (existingUser) {
-      console.log("El usuario ya existe:", existingUser);
-      return { message: "Error en el registro. El usuario ya existe." };
+      return {
+        success: false,
+        message: "Error en el registro. El usuario ya existe.",
+      };
     }
 
-    // Crear el usuario en Firebase Auth
+    // Crea el usuario en Firebase Authentication
     const userRecord = await auth.createUser({
       email: data.email,
       password: data.password,
@@ -57,7 +58,7 @@ async function signUpWorker(data) {
 
     // Guardar los datos del trabajador en la colección "workers" de Firestore
     await admin.firestore().collection("workers").doc(userId).set({
-      userId, // Agregar como campo en el documento
+      //userId, // Agregar como campo en el documento
       email: data.email,
       name: data.name,
       last_name: data.last_name,
@@ -66,7 +67,7 @@ async function signUpWorker(data) {
       createdAt: new Date(),
     });
 
-    return { message: "Registro exitoso", userId: userId };
+    return { success: true, message: "Registro exitoso!", userId };
   } catch (error) {
     console.error("Error al registrar trabajador:", error);
     return { message: "Error en el registro", error: error.message };

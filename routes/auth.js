@@ -9,19 +9,15 @@ const {
 // Ruta para el registro de usuarios (trabajadores o fundaciones)
 router.post("/signup", async (req, res) => {
   try {
-    const userId = await signUpWorker(req.body); // Llama a la función de registro
-    if (userId) {
-      res
-        .status(201)
-        .json({ userId, message: "Usuario registrado exitosamente" }); // Responde con el userId y mensaje de éxito
+    const result = await signUpWorker(req.body);
+    if (result.success) {
+      res.status(201).json({ userId: result.userId, message: result.message });
     } else {
-      res
-        .status(400)
-        .json({ message: "Error en el registro. El usuario ya existe." }); // Si el usuario ya existe, devuelve error 400
+      res.status(400).json({ message: result.message });
     }
   } catch (error) {
     console.error("Error en el registro:", error);
-    res.status(500).json({ error: "Error al registrar usuario" }); // Error interno del servidor
+    res.status(500).json({ error: "Error al registrar usuario" });
   }
 });
 
@@ -31,14 +27,16 @@ router.post("/login", async (req, res) => {
   console.log("Token recibido en backend:", tokenID);
   try {
     const loginResponse = await logIn(tokenID);
-    if (loginResponse) {
+    if (!loginResponse || !loginResponse.userData) {
+      res
+        .status(401)
+        .json({ message: "Credenciales no válidas o usuario no encontrado" });
+    } else {
       res.status(200).json({
         message: "Inicio de sesión exitoso",
         userId: loginResponse.userId,
         userData: loginResponse.userData,
       });
-    } else {
-      res.status(401).json({ message: "Credenciales no válidas" });
     }
   } catch (error) {
     res.status(500).json({ error: "Error al iniciar sesión" });
