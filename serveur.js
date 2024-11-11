@@ -29,16 +29,7 @@ app.get("/", async (req, res) => {
   res.json("hiiii we working on another dimension");
 });
 
-// app.get("/", async (req, res) => {
-//   try {
-//     const snapshot = await admin.database().ref("/").once("value");
-//     const data = snapshot.val();
-//     res.json(data);
-//   } catch (error) {
-//     console.error("Error al obtener datos:", error);
-//     res.status(500).send("Error al obtener datos");
-//   }
-// });
+//
 
 // Escuchar en el puerto
 app.listen(PORT, () => {

@@ -2,7 +2,19 @@ const express = require("express");
 const router = express.Router();
 const { admin } = require("../firebase/databaseConfig");
 
-// Ruta para
+// Ruta para obtener toda la realtime database
+router.get("/db", async (req, res) => {
+  try {
+    const snapshot = await admin.database().ref("/").once("value");
+    const data = snapshot.val();
+    res.json(data);
+  } catch (error) {
+    console.error("Error al obtener datos:", error);
+    res.status(500).send("Error al obtener datos");
+  }
+});
+
+// Ruta para contar la cantidad de terminales disponibles
 router.get("/count-terminals", async (req, res) => {
   try {
     const terminalRef = admin.database().ref("/Terminales");
