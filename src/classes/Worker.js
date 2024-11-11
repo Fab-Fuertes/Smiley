@@ -10,13 +10,18 @@ import UserBase from "./UserBase";
 // import React, { useState } from "react";
 
 export default class Worker extends UserBase {
-  constructor(name,last_name, email, phone) {
+  constructor(name,last_name, email, phone, role) {
     super(name, last_name, email, phone, 1); // Tipo de usuario 1 para Trabajador
     // New attributes
     this._createdAt = new Date();
     this._completedTasks = [];
     this._negativeOpinions = [];
     this._isWorking = false;
+    this._role = role;
+  }
+
+  getWorkerRole(){
+    return this._role;
   }
 
   getCreatedAt(){
@@ -29,11 +34,11 @@ export default class Worker extends UserBase {
   }
 
   // Getter y Setter para completedTasks y negativeOpinions
-  completedTasks() {
+  getCompletedTasks() {
     return this._completedTasks;
   }
 
-  completedTasks(labores) {
+  setCompletedTasks(labores) {
     if (Array.isArray(labores)) {
       this._completedTasks = labores;
     } else {

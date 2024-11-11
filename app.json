@@ -15,21 +15,23 @@
       "supportsTablet": true
     },
     "android": {
-      "googleServicesFile": "./google-services.json",
+      "googleServicesFile": "./android/app/google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.ingsoftapp.smiley"
     },
-    
     "web": {
-      "favicon": "./assets/favicon.png"
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
     },
     "extra": {
       "eas": {
         "projectId": "31e4fe4f-fd9a-43e5-b9b2-0b87b9cb9cda"
       }
-    }
+    },
+    "plugins": ["expo-router"]
   }
 }

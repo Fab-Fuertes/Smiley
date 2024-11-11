@@ -5,20 +5,12 @@ export default function MenuRating() {
   const [rankings, setRankings] = useState([]);
 
   // Configurar backendURL
-  let backendURL;
-
-  if (Platform.OS === "web") {
-    backendURL = "http://localhost:8000";
-  } else {
-    backendURL = "http://10.0.2.2:8000";
-  }
+  let backendURL = "https://smiley-web-service.onrender.com/api/opinions/count-positive-opinions";
 
   useEffect(() => {
     const fetchRankings = async () => {
       try {
-        const response = await fetch(
-          `${backendURL}/count-positive-opinions`
-        );
+        const response = await fetch(backendURL);
         const data = await response.json();
         setRankings(data);
       } catch (error) {

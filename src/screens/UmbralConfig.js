@@ -4,7 +4,7 @@ import { View, Button, Alert } from 'react-native';
 const UmbralConfig = ({ terminalId, refreshData }) => { // Añadir refreshData como prop
   const updateDynamicThreshold = async () => {
     try {
-      const response = await fetch('http://10.0.2.2:8000/update-dynamic-threshold', {
+      const response = await fetch('https://smiley-web-service.onrender.com/api/terminals/update-dynamic-threshold', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

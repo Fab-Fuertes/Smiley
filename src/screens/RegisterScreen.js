@@ -9,37 +9,91 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useAuth } from "../context/AuthContext";
+import { useNavigation } from "@react-navigation/native"; // Importar el hook de navegación
+import { Picker } from "@react-native-picker/picker"; // Importar el componente Picker
+import Worker from "../classes/Worker";
 
-export default function RegisterScreen({ onRegisterSuccess, navigateToLogin }) {
-  const { registerUser } = useAuth();
+export default function RegisterScreen() {
+  const { login } = useAuth(); // Obtén la función de registro del contexto
+  const navigation = useNavigation(); // Hook de navegación para redirigir
+
+  // Definir los roles disponibles
+  const roles = ["Limpieza", "Administración", "Técnico", "Gerente"];
+  const [role, setRole] = useState("Limpieza"); // Estado para el rol seleccionado
+
   const [email, setEmail] = useState("");
   const [localName, setLocalName] = useState("");
   const [lastName, setLastName] = useState(""); // Nuevo campo para el apellido
   const [phone, setPhone] = useState(""); // Nuevo campo para el teléfono
   const [localPassword, setLocalPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSignUp = async () => {
-    if (localPassword.length < 6) {
-      Alert.alert("Error", "La contraseña debe tener al menos 6 caracteres");
-      return;
-    }
+    setIsLoading(true);
 
     if (!email || !localPassword || !localName || !lastName || !phone) {
       Alert.alert("Error", "Todos los campos son obligatorios.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (localPassword.length < 6) {
+      Alert.alert("Error", "La contraseña debe tener al menos 6 caracteres");
+      setIsLoading(false);
       return;
     }
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       Alert.alert("Error", "Por favor ingrese un correo válido.");
+      setIsLoading(false);
       return;
     }
 
     try {
-      await registerUser(email, localPassword, localName, lastName, phone);
-      Alert.alert("Cuenta de usuario creada satisfactoriamente!");
-      onRegisterSuccess();
+      const response = await fetch(
+        "https://smiley-web-service.onrender.com/api/auth/signup",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: email,
+            password: localPassword,
+            name: localName,
+            last_name: lastName,
+            phone: phone,
+            role: role,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Registro exitoso
+        console.log("Registro exitoso:", data);
+        Alert.alert("Cuenta de usuario creada satisfactoriamente!");
+        login(data.email, data.password);
+        // Navegar a Home
+        navigation.navigate("Home");
+      } else {
+        console.error("Error al registrar el usuario:", data.message);
+        Alert.alert(
+          "Error",
+          data.message || "Algo salió mal, por favor intenta de nuevo."
+        );
+      }
     } catch (error) {
-      Alert.alert("Error", error.message);
+      console.error("Error al registrar el usuario:", error);
+
+      // Asegúrate de manejar el error de forma que no cause más errores
+      Alert.alert(
+        "Error",
+        error.message || "Hubo un problema al registrar el usuario."
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -72,6 +126,18 @@ export default function RegisterScreen({ onRegisterSuccess, navigateToLogin }) {
         onChangeText={setEmail}
         autoCapitalize="none"
       />
+
+      {/* Campo de selección para los roles */}
+      <Text style={styles.label}>Seleccione un rol</Text>
+      <Picker
+        selectedValue={role}
+        onValueChange={(itemValue) => setRole(itemValue)} // Actualizar el estado de role
+      >
+        {roles.map((roleItem, index) => (
+          <Picker.Item key={index} label={roleItem} value={roleItem} />
+        ))}
+      </Picker>
+
       <TextInput
         style={styles.input}
         placeholder="Contraseña"
@@ -79,9 +145,12 @@ export default function RegisterScreen({ onRegisterSuccess, navigateToLogin }) {
         onChangeText={setLocalPassword}
         secureTextEntry
       />
-      <Button title="Registrar" onPress={handleSignUp} />
 
-      <TouchableOpacity onPress={navigateToLogin}>
+      <Button title="Registrar" onPress={handleSignUp} disabled={isLoading} />
+
+      {/* {isLoading && <ActivityIndicator size="large" color="#0000ff" />} */}
+
+      <TouchableOpacity onPress={() => navigation.navigate("Login")}>
         <Text style={styles.loginText}>
           ¿Ya tienes una cuenta? Inicia sesión aquí!
         </Text>

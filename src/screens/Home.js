@@ -1,67 +1,41 @@
-import {
-  Text,
-  Image,
-  StyleSheet,
-  View,
-  ScrollView,
-  Button,
-  Alert,
-} from "react-native";
 import React from "react";
-import { useAuth } from "../context/AuthContext"; // Importamos el contexto de autenticación
+import { View, Text, Button, Alert, StyleSheet, Image } from "react-native";
+import { useAuth } from "../context/AuthContext"; // Importar el contexto de autenticación
+import { SafeAreaView } from "react-native";
+import { useNavigation } from "@react-navigation/native"; // Importar el hook de navegación
 
 export default function Home() {
-  const { user, logout } = useAuth();
+  const { user, logout, worker } = useAuth(); // Accedemos al usuario del contexto de autenticación
+  const navigation = useNavigation();
 
+  if (!user && !worker) {
+    return <Text>Cargando...</Text>;  // Asegúrate de mostrar algo mientras se carga el usuario
+  }
+  
   const handleSignOut = async () => {
     try {
-      await logout();
+      await logout(); // Llamamos al método logout del contexto
       Alert.alert("Has cerrado sesión... Hasta la próxima!");
+      navigation.navigate("WelcomeScreen"); // Redirigir a la pantalla de bienvenida
     } catch (error) {
       Alert.alert("Error", "No se pudo cerrar sesión");
     }
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <View style={styles.container}>
-        <Text style={styles.title}>SMILEY</Text>
-        {user ? (
-          <>
-            <Text style={styles.welcomeText}>
-              Bienvenido {user.name ? user.name : "usuario"}!
-            </Text>
-            <Text style={styles.texto2}>Email: {user.email}</Text>
-            <Text style={styles.texto2}>
-              Teléfono: {user.phone || "No disponible"}
-            </Text>
-          </>
-        ) : (
-          <Text style={styles.welcomeText}>
-            Bienvenido, usuario no identificado
-          </Text>
-        )}
-
-        <Text style={styles.texto2}>
-          Transformando la experiencia de cada visita
-        </Text>
-        <Image
-          style={styles.image}
-          source={require("../../assets/imagen23.png")}
-        />
-        <Text style={styles.slogan}>
-          Nuestro proyecto recopila, analiza y comparte las calificaciones
-          detalladas de baños enviadas por los usuarios, garantizando que
-          encuentres siempre un espacio higiénico, cómodo y acogedor donde más
-          lo necesitas.
-        </Text>
-        <Text style={styles.slogan2}>
-          Juntos, mejoramos los estándares de limpieza y comodidad en cada
-          rincón de tu universidad.
-        </Text>
-        <Button title="Cerrar sesión" onPress={handleSignOut} color="#FF0000" />
-      </View>
-    </ScrollView>
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.title}>SMILEY</Text>
+      <Image
+        style={styles.image}
+        source={require("../../assets/imagen23.png")}
+      />
+      <Text style={styles.welcomeText}>
+        Bienvenido: {worker?.getName() || "Usuario"}!
+      </Text>
+      <Text style={styles.texto2}>Email: {worker?.getEmail()}</Text>
+      
+      <Button title="Cerrar sesión" onPress={handleSignOut} color="#FF0000" />
+    </SafeAreaView>
   );
 }
 
@@ -108,8 +82,8 @@ const styles = StyleSheet.create({
     fontFamily: "serif",
   },
   image: {
-    width: 300,
-    height: 300,
+    width: 199,
+    height: 199,
     marginBottom: 30,
     borderRadius: 50,
   },

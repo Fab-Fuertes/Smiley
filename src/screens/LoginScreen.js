@@ -12,9 +12,13 @@ import {
 import { useAuth } from "../context/AuthContext"; // Usamos el contexto de autenticación
 import Worker from "../classes/Worker";
 import { signInAWorker } from "../context/AuthenticationService";
+import { useNavigation } from "@react-navigation/native"; // Importar el hook de navegación
 
-export default function LoginScreen({ onLoginSuccess, navigateToRegister }) {
+export default function LoginScreen() {
   const { login } = useAuth();
+
+  const navigation = useNavigation(); // Obtener hook de navegación
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -23,57 +27,55 @@ export default function LoginScreen({ onLoginSuccess, navigateToRegister }) {
     setIsLoading(true);
 
     if (!email || !password) {
-      Alert.alert("Error", "Por favor llene todos los campos");
+      Alert.alert(
+        "Error",
+        "Por favor, asegúrese de completar todos los campos."
+      );
       setIsLoading(false);
       return;
     }
 
     try {
-      // Autenticar al usuario y obtener su ID
-      const userId = await signInAWorker(
-        email,
-        password
-      );
-      if (!userId) {
-        Alert.alert(
-          "Error",
-          "El usuario no existe o la contraseña es incorrecta"
-        );
-        setIsLoading(false);
-        return;
-      }
+      // Autentica al usuario y obtén el `tokenID` y `uid`
+      const { token, uid } = await signInAWorker(email, password);
 
-      // Realizar la solicitud al backend para obtener los datos del usuario
+      console.log("Token recibido:", token);
+      console.log("UID recibido:", uid);
+
+      // Realiza la solicitud de inicio de sesión al backend
       const response = await fetch(
-        "https://smiley-web-service.onrender.com/auth/login",
+        "https://smiley-web-service.onrender.com/api/auth/login",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ tokenID: userId }),
+          body: JSON.stringify({ tokenID: token }), // Envía el tokenID y uid al backend
         }
       );
 
+      const data = await response.json();
       if (response.ok) {
-        const responseData = await response.json();
-        const userData = responseData.userId;
+        console.log("Inicio de sesión exitoso:", data);
 
-        // Crear un nuevo objeto Worker y asignarlo al contexto
-        const worker = new Worker(
-          userData.name,
-          userData.lastname,
-          userData.email,
-          userData.phone
-        );
-        login(worker);
-        Alert.alert("Éxito", "Inicio de sesión exitoso");
-        onLoginSuccess();
+        //
+        login(email, password);
+        
+        // Navegar a Home después de un login exitoso
+        navigation.navigate("Home");
       } else {
-        Alert.alert("Error", "Error en el servidor");
+        console.error("Error al iniciar sesión:", data.message);
+        Alert.alert(
+          "Error",
+          data.message || "Algo salió mal, por favor intenta de nuevo."
+        );
       }
     } catch (error) {
-      Alert.alert("Error", "Error en el proceso de autenticación");
+      console.error("Error de autenticación en frontend:", error.message);
+      Alert.alert(
+        "Error",
+        error.message || "Hubo un problema al iniciar sesión."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -81,7 +83,7 @@ export default function LoginScreen({ onLoginSuccess, navigateToRegister }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Inicio de Sesión</Text>
+      <Text style={styles.title}>Acceda a Smiley</Text>
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -104,7 +106,7 @@ export default function LoginScreen({ onLoginSuccess, navigateToRegister }) {
         />
       </View>
       {isLoading && <ActivityIndicator size="large" color="#0000ff" />}
-      <TouchableOpacity onPress={navigateToRegister}>
+      <TouchableOpacity onPress={() => navigation.navigate("Register")}>
         <Text style={styles.registerText}>
           ¿No tienes cuenta? Regístrate aquí!
         </Text>

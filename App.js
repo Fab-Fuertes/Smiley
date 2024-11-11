@@ -1,84 +1,118 @@
-import React, { useState } from "react";
-import { View, Button, Alert, StyleSheet } from "react-native";
+import React, { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import { enableScreens } from "react-native-screens";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createStackNavigator } from "@react-navigation/stack";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-import Home from "./src/screens/Home";
-import CommonArea from "./src/screens/CommonArea";
-import LoginScreen from "./src/screens/LoginScreen";
-import RegisterScreen from "./src/screens/RegisterScreen";
-
-import { AuthProvider, useAuth } from "./src/context/AuthContext";
+import { useAuth, AuthProvider } from "./src/context/AuthContext"; // Tu contexto de autenticación
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-enableScreens();
+import LoginScreen from "./src/screens/LoginScreen";
+import RegisterScreen from "./src/screens/RegisterScreen";
+import Home from "./src/screens/Home";
+import Profile from "./src/screens/Profile";
+import DataDisplay from "./src/screens/DataDisplay";
+import MenuRating from "./src/screens/MenuRating";
+import WelcomeScreen from "./src/screens/WelcomeScreen";
 
-export default function App() {
+const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
+
+function AuthStack() {
   return (
-    <SafeAreaProvider>
-      <AuthProvider>
-        <NavigationContainer>
-          <MainApp />
-        </NavigationContainer>
-      </AuthProvider>
-    </SafeAreaProvider>
+    <Stack.Navigator>
+      <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} options={{headerShown: false}}/>
+      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="Register" component={RegisterScreen} />
+    </Stack.Navigator>
   );
 }
 
-const MainApp = () => {
-  const { user, isAuthenticated, login, logout, registerUser } = useAuth();
-  const [isLoginScreen, setIsLoginScreen] = useState(true);
-
-  const handleLogin = async (email, password) => {
-    try {
-      await login(email, password);
-    } catch (error) {
-      Alert.alert("Error", "Credenciales no válidas");
-    }
-  };
-
-  const handleRegister = async (data) => {
-    try {
-      await registerUser(data);
-      setIsLoginScreen(true);
-    } catch (error) {
-      Alert.alert("Error", "No se pudo completar el registro");
-    }
-  };
-
-  if (!isAuthenticated) {
-    return isLoginScreen ? (
-      <LoginScreen
-        onLogin={handleLogin}
-        navigateToRegister={() => setIsLoginScreen(false)}
+function AppTabs() {
+  return (
+    <Tab.Navigator>
+      <Tab.Screen
+        name="Home"
+        component={Home}
+        options={{
+          headerShown: false,
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="home" color={color} size={size} />
+          ),
+          headerTintColor: "white",
+        }}
       />
-    ) : (
-      <RegisterScreen
-        onRegister={handleRegister}
-        navigateToLogin={() => setIsLoginScreen(true)}
+      <Tab.Screen
+        name="Menu"
+        component={MenuRating}
+        options={{
+          title: "RANKING", headerTitleAlign: "center", headerStyle: {backgroundColor: "#0000ff"},
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons
+              name="newspaper-variant"
+              color={color}
+              size={size}
+            />
+          ),
+          headerTintColor: "white",
+        }}
       />
-    );
+      <Tab.Screen
+        name="Data Display"
+        component={DataDisplay}
+        options={{
+          title: "REACCIONES", headerTitleAlign: "center", headerStyle: {backgroundColor: "#0000ff"},
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons
+              name="clipboard-text-multiple-outline"
+              color={color}
+              size={size}
+            />
+          ),
+          headerTintColor: "white",
+        }}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={Profile}
+        options={{
+          title: "PERFIL", headerTitleAlign: "center",
+          headerStyle: {backgroundColor: "#0000ff"}, 
+          headerShown: true,
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="account" color={color} size={size} />
+          ),
+          headerTintColor: "white",
+        }}
+      />
+    </Tab.Navigator>
+  );
+}
+
+function App() {
+  const { isAuthenticated } = useAuth(); // Estado de autenticación desde el contexto
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Verifica si el usuario ya está autenticado (a través de Firebase o similar)
+    setIsLoading(false);
+  }, []);
+
+  if (isLoading) {
+    return null; // O un componente de loading mientras se verifica el estado de la sesión
   }
 
   return (
-    <View style={styles.container}>
-      <Home />
-      <View style={styles.logoutButtonContainer}>
-        <Button title="Cerrar sesión" onPress={logout} color="#FF0000" />
-      </View>
-    </View>
+    <NavigationContainer>
+      {isAuthenticated ? <AppTabs /> : <AuthStack />}
+    </NavigationContainer>
   );
-};
+}
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    padding: 16,
-    backgroundColor: "#73a9f1",
-  },
-  logoutButtonContainer: {
-    marginTop: 20,
-    alignItems: "center",
-  },
-});
+export default function Main() {
+  return (
+    <AuthProvider>
+      <App />
+    </AuthProvider>
+  );
+}
