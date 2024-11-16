@@ -33,8 +33,7 @@ export default function Home() {
         Bienvenido: {worker?.getName() || "Usuario"}!
       </Text>
       <Text style={styles.texto2}>Email: {worker?.getEmail()}</Text>
-      
-      <Button title="Cerrar sesión" onPress={handleSignOut} color="#FF0000" />
+    
     </SafeAreaView>
   );
 }

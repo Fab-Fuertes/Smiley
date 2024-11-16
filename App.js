@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Component } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -14,6 +14,7 @@ import Profile from "./src/screens/Profile";
 import DataDisplay from "./src/screens/DataDisplay";
 import MenuRating from "./src/screens/MenuRating";
 import WelcomeScreen from "./src/screens/WelcomeScreen";
+import Speedometer from "./src/screens/speedometer";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -85,9 +86,25 @@ function AppTabs() {
           headerTintColor: "white",
         }}
       />
+       <Tab.Screen
+        name="Speedometer"
+        component={Speedometer} 
+        options={{
+          title: "Speedometer",
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons
+              name="car-speed-limiter"
+              color={color}
+              size={size}
+            />
+          ),
+        }}
+      />
     </Tab.Navigator>
   );
 }
+
+
 
 function App() {
   const { isAuthenticated } = useAuth(); // Estado de autenticación desde el contexto

@@ -1,14 +1,27 @@
-import { Text, StyleSheet, View, FlatList } from "react-native";
+import { Text, StyleSheet, Button, Alert, View, FlatList } from "react-native";
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useNavigation } from "@react-navigation/native"; // Importar el hook de navegación
+
 
 export default function Profile() {
-  const { user, worker } = useAuth(); // Accedemos al usuario del contexto de autenticación
+  const navigation = useNavigation();
+  const { user, worker, logout } = useAuth(); // Accedemos al usuario del contexto de autenticación
   if (!worker) {
     return <Text>Información de trabajador no disponible.</Text>;
   }
   // Obtenemos la lista de tareas completadas
   const completedTasks = worker?.getCompletedTasks() || [];
+
+  const handleSignOut = async () => {
+    try {
+      await logout(); // Llamamos al método logout del contexto
+      Alert.alert("Has cerrado sesión... Hasta la próxima!");
+      navigation.navigate("WelcomeScreen"); // Redirigir a la pantalla de bienvenida
+    } catch (error) {
+      Alert.alert("Error", "No se pudo cerrar sesión");
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -18,6 +31,8 @@ export default function Profile() {
       <Text>Email: {worker.getEmail()}</Text>
       <Text>Rol: {worker.getWorkerRole()}</Text>
       <Text>Teléfono: {worker.getPhoneNumber()}</Text>
+
+      <Button title="Cerrar sesión" onPress={handleSignOut} color="#FF0000" />
 
       <View style={styles.inputContainer}>
         <Text style={styles.subtitle}>Tareas Completadas:</Text>
