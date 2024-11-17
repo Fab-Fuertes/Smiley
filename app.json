@@ -28,14 +28,15 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-build-properties"
     ],
     "extra": {
       "router": {
         "origin": false
       },
       "eas": {
-        "projectId": "363fbd29-d277-4f73-ba0c-c5068f6b174f"
+        "projectId": "31e4fe4f-fd9a-43e5-b9b2-0b87b9cb9cda"
       }
     }
   }

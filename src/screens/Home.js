@@ -2,25 +2,25 @@ import React from "react";
 import { View, Text, Button, Alert, StyleSheet, Image } from "react-native";
 import { useAuth } from "../context/AuthContext"; // Importar el contexto de autenticación
 import { SafeAreaView } from "react-native";
-import { useNavigation } from "@react-navigation/native"; // Importar el hook de navegación
+//import { useNavigation } from "@react-navigation/native"; // Importar el hook de navegación
 
 export default function Home() {
   const { user, logout, worker } = useAuth(); // Accedemos al usuario del contexto de autenticación
-  const navigation = useNavigation();
+  // const navigation = useNavigation();
 
   if (!user && !worker) {
     return <Text>Cargando...</Text>;  // Asegúrate de mostrar algo mientras se carga el usuario
   }
   
-  const handleSignOut = async () => {
-    try {
-      await logout(); // Llamamos al método logout del contexto
-      Alert.alert("Has cerrado sesión... Hasta la próxima!");
-      navigation.navigate("WelcomeScreen"); // Redirigir a la pantalla de bienvenida
-    } catch (error) {
-      Alert.alert("Error", "No se pudo cerrar sesión");
-    }
-  };
+  // const handleSignOut = async () => {
+  //   try {
+  //     await logout(); // Llamamos al método logout del contexto
+  //     Alert.alert("Has cerrado sesión... Hasta la próxima!");
+  //     navigation.navigate("WelcomeScreen"); // Redirigir a la pantalla de bienvenida
+  //   } catch (error) {
+  //     Alert.alert("Error", "No se pudo cerrar sesión");
+  //   }
+  // };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -33,7 +33,8 @@ export default function Home() {
         Bienvenido: {worker?.getName() || "Usuario"}!
       </Text>
       <Text style={styles.texto2}>Email: {worker?.getEmail()}</Text>
-    
+      
+      {/* <Button title="Cerrar sesión" onPress={handleSignOut} color="#FF0000" /> */}
     </SafeAreaView>
   );
 }

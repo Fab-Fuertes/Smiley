@@ -1,17 +1,15 @@
-import { Text, StyleSheet, Button, Alert, View, FlatList } from "react-native";
+import { Text, StyleSheet, View, FlatList, Button, Alert } from "react-native";
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigation } from "@react-navigation/native"; // Importar el hook de navegación
 
-
 export default function Profile() {
+  const { user, logout, worker } = useAuth(); // Accedemos al usuario del contexto de autenticación
   const navigation = useNavigation();
-  const { user, worker, logout } = useAuth(); // Accedemos al usuario del contexto de autenticación
-  if (!worker) {
-    return <Text>Información de trabajador no disponible.</Text>;
+
+  if (!user && !worker) {
+    return <Text>Cargando...</Text>; // Asegúrate de mostrar algo mientras se carga el usuario
   }
-  // Obtenemos la lista de tareas completadas
-  const completedTasks = worker?.getCompletedTasks() || [];
 
   const handleSignOut = async () => {
     try {
@@ -23,6 +21,9 @@ export default function Profile() {
     }
   };
 
+  // Obtenemos la lista de tareas completadas
+  const completedTasks = worker?.getCompletedTasks() || [];
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Mi Perfil</Text>
@@ -31,8 +32,6 @@ export default function Profile() {
       <Text>Email: {worker.getEmail()}</Text>
       <Text>Rol: {worker.getWorkerRole()}</Text>
       <Text>Teléfono: {worker.getPhoneNumber()}</Text>
-
-      <Button title="Cerrar sesión" onPress={handleSignOut} color="#FF0000" />
 
       <View style={styles.inputContainer}>
         <Text style={styles.subtitle}>Tareas Completadas:</Text>
@@ -48,6 +47,8 @@ export default function Profile() {
           <Text>No hay tareas completadas aún.</Text>
         )}
       </View>
+
+      <Button title="Cerrar sesión" onPress={handleSignOut} color="#FF0000" />
     </View>
   );
 }

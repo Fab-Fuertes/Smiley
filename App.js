@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Component } from "react";
+import React, { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -14,7 +14,7 @@ import Profile from "./src/screens/Profile";
 import DataDisplay from "./src/screens/DataDisplay";
 import MenuRating from "./src/screens/MenuRating";
 import WelcomeScreen from "./src/screens/WelcomeScreen";
-import Speedometer from "./src/screens/speedometer";
+import Speedometer from './src/screens/SpeedoMeter';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -22,7 +22,11 @@ const Stack = createStackNavigator();
 function AuthStack() {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} options={{headerShown: false}}/>
+      <Stack.Screen
+        name="WelcomeScreen"
+        component={WelcomeScreen}
+        options={{ headerShown: false }}
+      />
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Register" component={RegisterScreen} />
     </Stack.Navigator>
@@ -47,7 +51,9 @@ function AppTabs() {
         name="Menu"
         component={MenuRating}
         options={{
-          title: "RANKING", headerTitleAlign: "center", headerStyle: {backgroundColor: "#0000ff"},
+          title: "RANKING",
+          headerTitleAlign: "center",
+          headerStyle: { backgroundColor: "#0000ff" },
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons
               name="newspaper-variant"
@@ -62,7 +68,9 @@ function AppTabs() {
         name="Data Display"
         component={DataDisplay}
         options={{
-          title: "REACCIONES", headerTitleAlign: "center", headerStyle: {backgroundColor: "#0000ff"},
+          title: "REACCIONES",
+          headerTitleAlign: "center",
+          headerStyle: { backgroundColor: "#0000ff" },
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons
               name="clipboard-text-multiple-outline"
@@ -77,8 +85,9 @@ function AppTabs() {
         name="Profile"
         component={Profile}
         options={{
-          title: "PERFIL", headerTitleAlign: "center",
-          headerStyle: {backgroundColor: "#0000ff"}, 
+          title: "PERFIL",
+          headerTitleAlign: "center",
+          headerStyle: { backgroundColor: "#0000ff" },
           headerShown: true,
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="account" color={color} size={size} />
@@ -86,11 +95,11 @@ function AppTabs() {
           headerTintColor: "white",
         }}
       />
-       <Tab.Screen
+      <Tab.Screen
         name="Speedometer"
-        component={Speedometer} 
+        component={Speedometer}
         options={{
-          title: "Speedometer",
+          title: "Speedometer Test",
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons
               name="car-speed-limiter"
@@ -103,8 +112,6 @@ function AppTabs() {
     </Tab.Navigator>
   );
 }
-
-
 
 function App() {
   const { isAuthenticated } = useAuth(); // Estado de autenticación desde el contexto
