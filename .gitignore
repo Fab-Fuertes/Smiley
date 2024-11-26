@@ -38,7 +38,7 @@ yarn-error.*
 .env*
 
 # ignores all google services files
-.google-services.json
+google-services.json
 
 # Advice: Add '/android' and '/ios' to your .gitignore file if you intend to use CNG / Prebuild. Learn more: https://docs.expo.dev/workflow/prebuild/#usage-with-eas-build
 /android

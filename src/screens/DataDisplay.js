@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import {
-  Platform,
   View,
   Text,
   StyleSheet,
   ActivityIndicator,
   ScrollView,
+  TouchableOpacity,
 } from "react-native";
 import UmbralConfig from "./UmbralConfig";
 import OpinionsDisplay from "./OpinionsDisplay";
@@ -16,7 +16,7 @@ export default function DataDisplay() {
   const [error, setError] = useState(null);
 
   // Backend URL
-  let backendURL = "https://smiley-web-service.onrender.com/api/terminals/db";
+  const backendURL = "https://smiley-web-service.onrender.com/api/terminals/db";
 
   const refreshData = async () => {
     setLoading(true);
@@ -39,141 +39,147 @@ export default function DataDisplay() {
     }
   };
 
-  // const refreshData = async () => {
-  //   setLoading(true);
-  //   try {
-  //     const response = await fetch(`${backendURL}`);
-  //     if (!response.ok) {
-  //       throw new Error(`HTTP error! status: ${response.status}`);
-  //     }
-  //     const jsonData = await response.json();
-  //     setData(jsonData);
-  //   } catch (err) {
-  //     setError(err);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   refreshData();
-
-  //   // Configurar WebSocket
-  //   const socket = new WebSocket(`ws://10.0.2.2:8000`); // Cambia esto si es necesario
-
-  //   socket.onopen = () => {
-  //     console.log("WebSocket connection established");
-  //   };
-
-  //   socket.onmessage = (event) => {
-  //     const newData = JSON.parse(event.data);
-  //     setData((prevData) => ({ ...prevData, Terminales: newData }));
-  //   };
-
-  //   socket.onerror = (error) => {
-  //     console.error("WebSocket error:", error);
-  //   };
-
-  //   socket.onclose = () => {
-  //     console.log("WebSocket connection closed");
-  //   };
-
-  //   setWs(socket); // Guardar socket en el estado
-
-  //   return () => {
-  //     socket.close(); // Cerrar la conexión al desmontar el componente
-  //   };
-  // }, []);
-
   useEffect(() => {
     refreshData();
   }, []);
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
+    return (
+      <View style={styles.centeredContainer}>
+        <ActivityIndicator size="large" color="#007BFF" />
+        <Text style={styles.loadingText}>Cargando datos...</Text>
+      </View>
+    );
   }
 
   if (error) {
     return (
-      <View style={styles.container}>
+      <View style={styles.centeredContainer}>
         <Text style={styles.errorText}>{error}</Text>
       </View>
     );
   }
 
   if (!data) {
-    return <Text>No hay datos disponibles</Text>;
+    return (
+      <View style={styles.centeredContainer}>
+        <Text style={styles.noDataText}>No hay datos disponibles</Text>
+      </View>
+    );
   }
 
   return (
-    <ScrollView>
+    <ScrollView style={styles.scrollContainer}>
       <View style={styles.container}>
-        <Text style={styles.title}>Terminales:</Text>
+        <Text style={styles.title}>Terminales</Text>
         {data.Terminales ? (
           Object.entries(data.Terminales).map(([terminalKey, terminalData]) => {
             const terminalId = terminalData.ID;
             const umbral = terminalData.umbral;
-            const opinionsForTerminal = data.opiniones[terminalId] || {};
 
             return (
-              <View key={terminalKey}>
-                <Text
-                  style={styles.item}
-                >{`Corimon piso (${terminalId})`}</Text>
+              <View key={terminalKey} style={styles.card}>
+                <Text style={styles.cardTitle}>
+                  {`Corimon Piso (${terminalId})`}
+                </Text>
                 <OpinionsDisplay
-                  terminalId={terminalData.ID}
+                  terminalId={terminalId}
                   opinions={data.opiniones[terminalId] || {}}
                 />
                 <Text style={styles.subtitle}>
                   {`Umbral Configurado: ${umbral}`}
                 </Text>
                 <UmbralConfig
-                  terminalId={terminalData.ID}
+                  terminalId={terminalId}
                   refreshData={refreshData}
                 />
               </View>
             );
           })
         ) : (
-          <Text>No hay terminales disponibles</Text>
+          <Text style={styles.noDataText}>No hay terminales disponibles</Text>
         )}
+        <TouchableOpacity
+          style={styles.refreshButton}
+          onPress={refreshData}
+        >
+          <Text style={styles.refreshButtonText}>Actualizar Datos</Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
 }
 
-// Estilos del componente
 const styles = StyleSheet.create({
+  scrollContainer: {
+    backgroundColor: "#190747",
+  },
   container: {
     padding: 20,
-    backgroundColor: "#007BFF",
+  },
+  centeredContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#252A34",
   },
   title: {
-    fontSize: 30,
-    fontWeight: "bold",
-    marginBottom: 10,
-    fontFamily: "serif",
+    fontSize: 28,
+    fontWeight: "700",
+    color: "#FFFFFF",
     textAlign: "center",
+    marginBottom: 20,
+  },
+  card: {
+    backgroundColor: "#252A34",
+    borderRadius: 15,
+    padding: 20,
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  cardTitle: {
+    fontSize: 22,
+    fontWeight: "600",
+    color: "#FFD700",
+    marginBottom: 10,
   },
   subtitle: {
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "500",
+    color: "#AAAAFF",
     marginTop: 10,
   },
-  item: {
-    fontSize: 24,
-    fontWeight: "bold",
-    fontStyle: "italic",
-    paddingVertical: 5,
-    fontFamily: "serif",
-  },
-  anonymousButton: {
+  noDataText: {
+    fontSize: 18,
+    color: "#AAAAFF",
+    textAlign: "center",
     marginTop: 20,
   },
   errorText: {
     color: "red",
     fontSize: 18,
     textAlign: "center",
+    marginHorizontal: 20,
+  },
+  loadingText: {
+    fontSize: 16,
+    marginTop: 10,
+    color: "#007BFF",
+  },
+  refreshButton: {
+    backgroundColor: "#007BFF",
+    borderRadius: 10,
+    paddingVertical: 15,
+    alignItems: "center",
     marginTop: 20,
+  },
+  refreshButtonText: {
+    color: "#FFF",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });

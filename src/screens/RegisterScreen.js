@@ -168,6 +168,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
     textAlign: "center",
     fontSize: 16,
+    
     textDecorationLine: "underline",
   },
 });

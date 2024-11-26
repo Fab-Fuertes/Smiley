@@ -1,5 +1,12 @@
 import React from "react";
-import { View, Text, Button, Alert, StyleSheet, Image } from "react-native";
+import {
+  View,
+  Text,
+  Alert,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+} from "react-native";
 import { useAuth } from "../context/AuthContext"; // Importar el contexto de autenticación
 import { SafeAreaView } from "react-native";
 import { useNavigation } from "@react-navigation/native"; // Importar el hook de navegación
@@ -9,13 +16,17 @@ export default function Home() {
   const navigation = useNavigation();
 
   if (!user && !worker) {
-    return <Text>Cargando...</Text>;  // Asegúrate de mostrar algo mientras se carga el usuario
+    return (
+      <View style={styles.loadingContainer}>
+        <Text style={styles.loadingText}>Cargando...</Text>
+      </View>
+    ); // Asegúrate de mostrar algo mientras se carga el usuario
   }
-  
+
   const handleSignOut = async () => {
     try {
       await logout(); // Llamamos al método logout del contexto
-      Alert.alert("Has cerrado sesión... Hasta la próxima!");
+      Alert.alert("Has cerrado sesión... ¡Hasta la próxima!");
       navigation.navigate("WelcomeScreen"); // Redirigir a la pantalla de bienvenida
     } catch (error) {
       Alert.alert("Error", "No se pudo cerrar sesión");
@@ -24,7 +35,12 @@ export default function Home() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>SMILEY</Text>
+       <View style={styles.imageContainer}>
+        <Image
+          style={styles.image1}
+          source={require("../../assets/smileylogo.png")}
+        />
+      </View>
       <Image
         style={styles.image}
         source={require("../../assets/imagen23.png")}
@@ -32,66 +48,113 @@ export default function Home() {
       <Text style={styles.welcomeText}>
         Bienvenido: {worker?.getName() || "Usuario"}!
       </Text>
-      <Text style={styles.texto2}>Email: {worker?.getEmail()}</Text>
-      
-      <Button title="Cerrar sesión" onPress={handleSignOut} color="#FF0000" />
+      <Text style={styles.text}>Email: {worker?.getEmail()}</Text>
+
+      <View style={styles.divider} />
+
+      <TouchableOpacity
+        style={styles.logoutButton}
+        onPress={handleSignOut}
+        activeOpacity={0.8}
+      >
+        <Text style={styles.logoutButtonText}>Cerrar sesión</Text>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  scrollContainer: {
-    flexGrow: 1,
-    justifyContent: "center",
-  },
   container: {
     flex: 1,
-    backgroundColor: "#007BFF",
+    backgroundColor: "#190747",
     alignItems: "center",
     justifyContent: "center",
     padding: 20,
   },
+  header: {
+    backgroundColor: "#007BFF",
+    padding: 20,
+    width: "100%",
+    alignItems: "center",
+    borderRadius: 10,
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+  },
   title: {
-    fontSize: 50,
+    fontSize: 48,
     fontWeight: "bold",
     color: "white",
-    marginBottom: 15,
-    fontFamily: "serif",
-  },
-  texto2: {
-    fontSize: 15,
-    fontWeight: "bold",
-    color: "white",
-    marginBottom: 25,
-    fontFamily: "serif",
-  },
-  slogan2: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "white",
-    textAlign: "center",
-    marginBottom: 25,
-    fontFamily: "serif",
-  },
-  slogan: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "white",
-    textAlign: "justify",
-    marginBottom: 15,
     fontFamily: "serif",
   },
   image: {
-    width: 199,
-    height: 199,
-    marginBottom: 30,
-    borderRadius: 50,
+    width: 180,
+    height: 180,
+    borderRadius: 35,
+    marginBottom: 20,
+    borderWidth: 4,
+    borderColor: "#007BFF",
   },
   welcomeText: {
-    fontSize: 20,
-    fontWeight: "bold",
-    fontFamily: "serif",
-    fontStyle: "italic",
+    fontSize: 22,
+    fontWeight: "600",
+    color: "#FFFFFF",
+    textAlign: "center",
     marginBottom: 10,
+    fontFamily: "serif",
+  },
+  text: {
+    fontSize: 16,
+    color: "#FFFFFF",
+    textAlign: "center",
+    marginBottom: 20,
+    fontFamily: "sans-serif",
+  },
+  divider: {
+    height: 1,
+    width: "80%",
+    backgroundColor: "#DDD",
+    marginVertical: 20,
+  },
+  logoutButton: {
+    backgroundColor: "#FF0000",
+    paddingVertical: 12,
+    paddingHorizontal: 25,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  logoutButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
+    textAlign: "center",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#F0F4F8",
+  },
+  loadingText: {
+    fontSize: 18,
+    color: "#555",
+  },
+  imageContainer: {
+    justifyContent: "center", // Centra verticalmente
+    alignItems: "center", // Centra horizontalmente
+    marginTop: 10, // Espaciado superior opcional
+  },
+  image1: {
+    width: 380,
+    height: 180,
+    borderRadius: 3,
+    marginBottom: 20,
+    borderWidth: 4,
   },
 });
